@@ -4,6 +4,7 @@ public sealed class HrDirector
 {
     public double CalculateMeanHarmonic(HackathonMetaInfo hackathonMetaInfo)
     {
+        ValidateParticipants(hackathonMetaInfo);
         var totalSatisfactionScores = new List<double>();
 
         var teamLeadsWishlistsDict = hackathonMetaInfo.TeamLeadsWishlists
@@ -28,12 +29,28 @@ public sealed class HrDirector
     private double CalculateSatisfactionScore(int desiredEmployeeId, int[] wishlistIds)
     {
         var rank = Array.IndexOf(wishlistIds, desiredEmployeeId);
-        return 20 - rank;
+        var countParticipants = wishlistIds.Length;
+        return countParticipants - rank;
     }
 
     private double CalculateHarmonic(IEnumerable<double> values)
     {
         var sumOfInverses = values.Sum(v => 1 / v);
         return values.Count() / sumOfInverses;
+    }
+
+    private void ValidateParticipants(HackathonMetaInfo hackathonMetaInfo)
+    {
+        if (hackathonMetaInfo.TeamLeadsWishlists.Any(w => w == null) ||
+            hackathonMetaInfo.JuniorsWishlists.Any(w => w == null))
+        {
+            throw new InvalidOperationException("Список участников содержит некорректные данные: один или несколько элементов равны null.");
+        }
+
+        if (hackathonMetaInfo.TeamLeadsWishlists.Count() !=
+            hackathonMetaInfo.JuniorsWishlists.Count())
+        {
+            throw new InvalidOperationException("Невозможно сформировать команды: количество тимлидов и количество участников не совпадает.");
+        }
     }
 }

@@ -1,10 +1,16 @@
+using Microsoft.Extensions.Configuration;
+
 namespace HackathonEveryone;
 
-public abstract class Program
-{
+public class Program
+{ 
     public static void Main()
     {
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        
         var app = new AppHackathon();
-        app.Run();
+        app.Run(builder.Build());
     }
 }

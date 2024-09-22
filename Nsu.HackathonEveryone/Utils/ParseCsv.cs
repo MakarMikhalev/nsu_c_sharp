@@ -7,7 +7,7 @@ namespace HackathonEveryone.Utils;
 
 public abstract class ParseCsv
 {
-    public static List<Employee> RunAsync(string filePath)
+    public static List<Employee> RunAsync(string? filePath)
     {
         var employees = new List<Employee>();
 

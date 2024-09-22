@@ -10,12 +10,12 @@ public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
         IEnumerable<Wishlist> juniorsWishlists)
     {
         var teams = new List<Team>();
-        var availableJuniors = new HashSet<Employee?>(juniors);
-        var availableTeamLeads = new HashSet<Employee?>(teamLeads);
+        var availableJuniors = new HashSet<Employee>(juniors);
+        var availableTeamLeads = new HashSet<Employee>(teamLeads);
 
         var teamLeadsWishlistsDict = teamLeadsWishlists.ToDictionary(w => w.EmployeeId, w => w);
         var juniorsWishlistsDict = juniorsWishlists.ToDictionary(w => w.EmployeeId, w => w);
-        while (availableJuniors.Any() && availableTeamLeads.Any())
+        while (availableJuniors.Count != 0 && availableTeamLeads.Count != 0)
         {
             Employee? bestJunior = null;
             Employee? bestTeamLead = null;
@@ -23,12 +23,10 @@ public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
 
             foreach (var junior in availableJuniors)
             {
-                if (junior == null) continue;
                 var juniorWishlist = juniorsWishlistsDict[junior.Id];
 
                 foreach (var teamLead in availableTeamLeads)
                 {
-                    if (teamLead == null) continue;
                     var teamLeadWishlist = teamLeadsWishlistsDict[teamLead.Id];
                     var satisfactionScore = CalculateSatisfactionScore(junior, teamLead,
                         juniorWishlist, teamLeadWishlist);
@@ -39,9 +37,6 @@ public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
                     bestTeamLead = teamLead;
                 }
             }
-
-            if (bestJunior == null) continue;
-
             teams.Add(new Team(bestJunior, bestTeamLead));
             availableJuniors.Remove(bestJunior);
             availableTeamLeads.Remove(bestTeamLead);
@@ -50,14 +45,14 @@ public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
         return teams;
     }
 
-    private static int CalculateSatisfactionScore(Employee junior, Employee teamLead,
+    private int CalculateSatisfactionScore(Employee junior, Employee teamLead,
         Wishlist juniorWishlist, Wishlist teamLeadWishlist)
     {
         return GetPreferenceIndex(juniorWishlist.DesiredEmployees, teamLead.Id) +
                GetPreferenceIndex(teamLeadWishlist.DesiredEmployees, junior.Id);
     }
 
-    private static int GetPreferenceIndex(int[] desiredEmployees, int employeeId)
+    private int GetPreferenceIndex(int[] desiredEmployees, int employeeId)
     {
         var index = Array.IndexOf(desiredEmployees, employeeId);
         return index >= 0 ? index + 1 : 0;

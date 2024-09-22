@@ -1,28 +1,29 @@
 using HackathonEveryone.ServiceContract;
-using HackathonEveryone.ServiceContract.Impl;
 
 namespace HackathonEveryone.Model.Employee;
 
 public class HrManager
 {
-    private readonly ITeamBuildingStrategy _teamBuildingStrategy = new TeamBuildingStrategy();
-    private readonly IWishlistGenerator _wishlistGenerator = new WishlistGenerator();
+    private readonly ITeamBuildingStrategy _teamBuildingStrategy;
+
+    public HrManager(ITeamBuildingStrategy _teamBuildingStrategy)
+    {
+        this._teamBuildingStrategy = _teamBuildingStrategy;
+    }
 
     public HackathonMetaInfo OrganizeHackathon(IEnumerable<Employee> juniors,
         IEnumerable<Employee> teamLeads)
     {
-        var requestingEmployees = juniors as Employee[] ?? juniors.ToArray();
-        var availableEmployees = teamLeads as Employee[] ?? teamLeads.ToArray();
+        var requestingEmployees = juniors.ToArray();
+        var availableEmployees = teamLeads.ToArray();
 
-        var wishlistsJuniors =
-            _wishlistGenerator.GenerateWishlists(requestingEmployees, availableEmployees);
+        var teamLeadsWishlists = juniors.Distinct()
+            .Select(e => e.getWishlist(juniors))
+            .ToList();
 
-        var wishlistTeamLeads =
-            _wishlistGenerator.GenerateWishlists(availableEmployees, requestingEmployees);
-
-        var teamLeadsWishlists = wishlistTeamLeads as Wishlist[] ?? wishlistTeamLeads.ToArray();
-
-        var juniorsWishlists = wishlistsJuniors as Wishlist[] ?? wishlistsJuniors.ToArray();
+        var juniorsWishlists = teamLeads.Distinct()
+            .Select(e => e.getWishlist(teamLeads))
+            .ToList();
 
         var teams = _teamBuildingStrategy.BuildTeams(
             requestingEmployees,

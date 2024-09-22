@@ -1,35 +1,39 @@
 ﻿using HackathonEveryone.Model.Employee;
+using HackathonEveryone.ServiceContract.Impl;
 using HackathonEveryone.Utils;
+using Microsoft.Extensions.Configuration;
 
 namespace HackathonEveryone;
 
 public class AppHackathon
 {
-    private const string JuniorFile = "./Juniors20.csv";
-    private const string TeamLeadFile = "./Teamleads20.csv";
-    private const int СountInteration = 1000;
-
-    private readonly HrManager _hrManager = new();
+    private readonly HrManager _hrManager = new(new TeamBuildingStrategy());
     private readonly HrDirector _hrDirector = new();
 
-    public void Run()
+    public void Run(IConfiguration configuration)
     {
         try
         {
+            var juniorFile = configuration["HackathonSettings:JuniorFile"];
+            var teamLeadFile = configuration["HackathonSettings:TeamLeadFile"];
+            var countIteration =
+                int.Parse(configuration["HackathonSettings:CountIteration"] ?? string.Empty);
+
             List<double> harmonicsResults = [];
 
-            for (var i = 0; i < СountInteration; ++i)
+            for (var i = 1; i <= countIteration; ++i)
             {
-                var juniors = ParseCsv.RunAsync(JuniorFile);
-                var teamLeads = ParseCsv.RunAsync(TeamLeadFile);
+                var juniors = ParseCsv.RunAsync(juniorFile);
+                var teamLeads = ParseCsv.RunAsync(teamLeadFile);
 
                 var teams = _hrManager.OrganizeHackathon(juniors, teamLeads);
                 var harmonic = _hrDirector.CalculateMeanHarmonic(teams);
                 harmonicsResults.Add(harmonic);
                 Console.WriteLine("Mean harmonic " + _hrDirector.CalculateMeanHarmonic(teams));
+                PrintHarmonicResult(harmonicsResults, i);
             }
 
-            PrintHarmonicResult(harmonicsResults);
+            PrintHarmonicResult(harmonicsResults, countIteration);
         }
         catch (Exception ex)
         {
@@ -37,11 +41,10 @@ public class AppHackathon
         }
     }
 
-    private static void PrintHarmonicResult(List<double> harmonicsResults)
+    private static void PrintHarmonicResult(List<double> harmonicsResults, int countInteration)
     {
+        Console.WriteLine("_________________________________________________________");
         Console.WriteLine(
-            "______________________________________________________________________________________________");
-        Console.WriteLine(
-            $"Harmonic mean = {СountInteration / harmonicsResults.Sum()} for {СountInteration} iteration(s)");
+            $"Harmonic mean = {harmonicsResults.Sum() / countInteration} for {countInteration} iteration(s)");
     }
 }
