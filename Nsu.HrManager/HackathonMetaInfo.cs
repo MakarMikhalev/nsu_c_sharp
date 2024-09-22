@@ -1,4 +1,6 @@
-namespace HackathonEveryone.Model;
+using Nsu.HackathonContract.Model;
+
+namespace HackathonHrManager;
 
 public record HackathonMetaInfo(
     IEnumerable<Wishlist> TeamLeadsWishlists,

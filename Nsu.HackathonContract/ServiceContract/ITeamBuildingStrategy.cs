@@ -1,7 +1,6 @@
-﻿using HackathonEveryone.Model;
-using HackathonEveryone.Model.Employee;
+﻿using Nsu.HackathonContract.Model;
 
-namespace HackathonEveryone.ServiceContract;
+namespace Nsu.HackathonContract.ServiceContract;
 
 public interface ITeamBuildingStrategy
 {

@@ -1,7 +1,7 @@
-using HackathonEveryone.Model;
-using HackathonEveryone.Model.Employee;
+using Nsu.HackathonContract.Model;
+using Nsu.HackathonContract.ServiceContract;
 
-namespace HackathonEveryone.ServiceContract.Impl;
+namespace Nsu.HackathonStrategy;
 
 public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
 {

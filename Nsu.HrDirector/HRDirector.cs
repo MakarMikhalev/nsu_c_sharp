@@ -1,4 +1,6 @@
-namespace HackathonEveryone.Model.Employee;
+using HackathonHrManager;
+
+namespace HrDirector;
 
 public sealed class HrDirector
 {

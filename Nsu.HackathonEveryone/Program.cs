@@ -1,16 +1,33 @@
+using HackathonHrManager;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Nsu.Hackathon;
+using Nsu.HackathonContract.ServiceContract;
+using Nsu.HackathonStrategy;
 
 namespace HackathonEveryone;
 
-public class Program
-{ 
+public static class Program
+{
     public static void Main()
     {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        
-        var app = new AppHackathon();
-        app.Run(builder.Build());
+        CreateHostBuilder().Build().RunAsync();
     }
+
+    private static IHostBuilder CreateHostBuilder() =>
+        Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration(config =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            })
+            .ConfigureServices(services =>
+            {
+                services.AddTransient<Hackathon>(_ => new Hackathon());
+                services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
+                services.AddTransient<HrManager>();
+                services.AddTransient<HrDirector.HrDirector>();
+                services.AddHostedService<HackathonWorker>();
+            });
 }

@@ -1,11 +1,11 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using HackathonEveryone.Model.Employee;
+using Nsu.HackathonContract.Model;
 
 namespace HackathonEveryone.Utils;
 
-public abstract class ParseCsv
+public static class ParseCsv
 {
     public static List<Employee> RunAsync(string? filePath)
     {

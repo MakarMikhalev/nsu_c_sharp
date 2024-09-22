@@ -1,16 +1,31 @@
-﻿using HackathonEveryone.Model.Employee;
-using HackathonEveryone.ServiceContract.Impl;
-using HackathonEveryone.Utils;
+﻿using HackathonEveryone.Utils;
+using HackathonHrManager;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Nsu.Hackathon;
 
 namespace HackathonEveryone;
 
-public class AppHackathon
+public class HackathonWorker(
+    HrManager hrManager,
+    HrDirector.HrDirector hrDirector,
+    Hackathon hackathon,
+    IConfiguration configuration)
+    : IHostedService
 {
-    private readonly HrManager _hrManager = new(new TeamBuildingStrategy());
-    private readonly HrDirector _hrDirector = new();
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        StartHackathon();
+        return Task.CompletedTask;
+    }
 
-    public void Run(IConfiguration configuration)
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void StartHackathon()
     {
         try
         {
@@ -20,16 +35,16 @@ public class AppHackathon
                 int.Parse(configuration["HackathonSettings:CountIteration"] ?? string.Empty);
 
             List<double> harmonicsResults = [];
+            var juniors = ParseCsv.RunAsync(juniorFile);
+            var teamLeads = ParseCsv.RunAsync(teamLeadFile);
 
             for (var i = 1; i <= countIteration; ++i)
             {
-                var juniors = ParseCsv.RunAsync(juniorFile);
-                var teamLeads = ParseCsv.RunAsync(teamLeadFile);
-
-                var teams = _hrManager.OrganizeHackathon(juniors, teamLeads);
-                var harmonic = _hrDirector.CalculateMeanHarmonic(teams);
+                var wishlistParticipants = hackathon.Start(juniors, teamLeads);
+                var teams = hrManager.OrganizeHackathon(juniors, teamLeads, wishlistParticipants);
+                var harmonic = hrDirector.CalculateMeanHarmonic(teams);
+                Console.WriteLine("Mean harmonic " + hrDirector.CalculateMeanHarmonic(teams));
                 harmonicsResults.Add(harmonic);
-                Console.WriteLine("Mean harmonic " + _hrDirector.CalculateMeanHarmonic(teams));
                 PrintHarmonicResult(harmonicsResults, i);
             }
 
