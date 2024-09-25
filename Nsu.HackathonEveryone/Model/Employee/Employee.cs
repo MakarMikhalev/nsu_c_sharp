@@ -2,7 +2,7 @@
 
 public record Employee(int Id, string Name)
 {
-    public Wishlist getWishlist(IEnumerable<Employee> availableEmployees)
+    public Wishlist GetWishlist(IEnumerable<Employee> availableEmployees)
     {
         return new Wishlist(Id, availableEmployees
             .Distinct()

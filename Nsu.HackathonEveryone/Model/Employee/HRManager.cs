@@ -22,7 +22,7 @@ public class HrManager
             .ToList();
 
         var juniorsWishlists = teamLeads.Distinct()
-            .Select(e => e.getWishlist(teamLeads))
+            .Select(e => e.GetWishlist(teamLeads))
             .ToList();
 
         var teams = _teamBuildingStrategy.BuildTeams(

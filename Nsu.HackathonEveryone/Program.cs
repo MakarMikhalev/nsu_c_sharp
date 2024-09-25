@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace HackathonEveryone;
 
-public class Program
+public static class Program
 { 
     public static void Main()
     {
