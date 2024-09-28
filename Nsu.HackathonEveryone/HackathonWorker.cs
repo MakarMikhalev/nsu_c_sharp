@@ -1,4 +1,5 @@
 ﻿using HackathonEveryone.Utils;
+using HackathonHrDirector;
 using HackathonHrManager;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -8,7 +9,7 @@ namespace HackathonEveryone;
 
 public class HackathonWorker(
     HrManager hrManager,
-    HrDirector.HrDirector hrDirector,
+    HrDirector hrDirector,
     Hackathon hackathon,
     IConfiguration configuration)
     : IHostedService
@@ -33,7 +34,7 @@ public class HackathonWorker(
             var teamLeadFile = configuration["HackathonSettings:TeamLeadFile"];
             var countIteration =
                 int.Parse(configuration["HackathonSettings:CountIteration"] ?? string.Empty);
-
+            
             List<double> harmonicsResults = [];
             var juniors = ParseCsv.RunAsync(juniorFile);
             var teamLeads = ParseCsv.RunAsync(teamLeadFile);

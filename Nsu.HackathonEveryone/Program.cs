@@ -1,3 +1,4 @@
+using HackathonHrDirector;
 using HackathonHrManager;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +28,7 @@ public static class Program
                 services.AddTransient<Hackathon>(_ => new Hackathon());
                 services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
                 services.AddTransient<HrManager>();
-                services.AddTransient<HrDirector.HrDirector>();
+                services.AddTransient<HrDirector>();
                 services.AddHostedService<HackathonWorker>();
             });
 }

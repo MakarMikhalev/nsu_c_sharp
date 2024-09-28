@@ -1,6 +1,6 @@
 using HackathonHrManager;
 
-namespace HrDirector;
+namespace HackathonHrDirector;
 
 public sealed class HrDirector
 {
@@ -17,12 +17,16 @@ public sealed class HrDirector
         foreach (var team in hackathonMetaInfo.Teams)
         {
             if (teamLeadsWishlistsDict.TryGetValue(team.TeamLead.Id, out var teamLeadWishlist))
+            {
                 totalSatisfactionScores.Add(CalculateSatisfactionScore(team.Junior.Id,
                     teamLeadWishlist.DesiredEmployees));
+            }
 
             if (juniorsWishlistsDict.TryGetValue(team.Junior.Id, out var juniorWishlist))
+            {
                 totalSatisfactionScores.Add(CalculateSatisfactionScore(team.TeamLead.Id,
                     juniorWishlist.DesiredEmployees));
+            }
         }
 
         return CalculateHarmonic(totalSatisfactionScores);
@@ -46,13 +50,15 @@ public sealed class HrDirector
         if (hackathonMetaInfo.TeamLeadsWishlists.Any(w => w == null) ||
             hackathonMetaInfo.JuniorsWishlists.Any(w => w == null))
         {
-            throw new InvalidOperationException("Список участников содержит некорректные данные: один или несколько элементов равны null.");
+            throw new InvalidOperationException(
+                "Список участников содержит некорректные данные: один или несколько элементов равны null.");
         }
 
         if (hackathonMetaInfo.TeamLeadsWishlists.Count() !=
             hackathonMetaInfo.JuniorsWishlists.Count())
         {
-            throw new InvalidOperationException("Невозможно сформировать команды: количество тимлидов и количество участников не совпадает.");
+            throw new InvalidOperationException(
+                "Невозможно сформировать команды: количество тимлидов и количество участников не совпадает.");
         }
     }
 }

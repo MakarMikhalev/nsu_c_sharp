@@ -19,7 +19,9 @@ public class HrManager(ITeamBuildingStrategy teamBuildingStrategy)
             wishlistParticipants.juniorsWishlists,
             wishlistParticipants.teamLeadsWishlists);
 
-        return new HackathonMetaInfo(wishlistParticipants.juniorsWishlists,
-            wishlistParticipants.teamLeadsWishlists, teams);
+        return new HackathonMetaInfo(
+            wishlistParticipants.juniorsWishlists,
+            wishlistParticipants.teamLeadsWishlists,
+            teams);
     }
 }
