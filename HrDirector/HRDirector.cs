@@ -18,14 +18,21 @@ public sealed class HrDirector
         {
             if (teamLeadsWishlistsDict.TryGetValue(team.TeamLead.Id, out var teamLeadWishlist))
             {
-                totalSatisfactionScores.Add(CalculateSatisfactionScore(team.Junior.Id,
-                    teamLeadWishlist.DesiredEmployees));
+                totalSatisfactionScores.Add(
+                    CalculateSatisfactionScore(
+                        team.Junior.Id,
+                        teamLeadWishlist.DesiredEmployees
+                    )
+                );
             }
 
             if (juniorsWishlistsDict.TryGetValue(team.Junior.Id, out var juniorWishlist))
             {
-                totalSatisfactionScores.Add(CalculateSatisfactionScore(team.TeamLead.Id,
-                    juniorWishlist.DesiredEmployees));
+                totalSatisfactionScores.Add(
+                    CalculateSatisfactionScore(
+                        team.TeamLead.Id,
+                        juniorWishlist.DesiredEmployees)
+                );
             }
         }
 

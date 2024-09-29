@@ -1,3 +1,5 @@
 ﻿namespace HackathonContract.Model;
 
-public record Employee(int Id, string Name);
+public record Employee(
+    int Id, 
+    string Name);

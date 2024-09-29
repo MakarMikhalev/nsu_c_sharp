@@ -28,8 +28,11 @@ public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
                 foreach (var teamLead in availableTeamLeads)
                 {
                     var teamLeadWishlist = teamLeadsWishlistsDict[teamLead.Id];
-                    var satisfactionScore = CalculateSatisfactionScore(junior, teamLead,
-                        juniorWishlist, teamLeadWishlist);
+                    var satisfactionScore = CalculateSatisfactionScore(
+                        junior,
+                        teamLead,
+                        juniorWishlist,
+                        teamLeadWishlist);
 
                     if (satisfactionScore <= maxSatisfactionScore) continue;
                     maxSatisfactionScore = satisfactionScore;
@@ -37,6 +40,7 @@ public sealed class TeamBuildingStrategy : ITeamBuildingStrategy
                     bestTeamLead = teamLead;
                 }
             }
+
             teams.Add(new Team(bestJunior, bestTeamLead));
             availableJuniors.Remove(bestJunior);
             availableTeamLeads.Remove(bestTeamLead);

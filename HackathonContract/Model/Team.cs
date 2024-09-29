@@ -1,3 +1,5 @@
 ﻿namespace HackathonContract.Model;
 
-public record Team(Employee? TeamLead, Employee? Junior);
+public record Team(
+    Employee? TeamLead, 
+    Employee? Junior);
