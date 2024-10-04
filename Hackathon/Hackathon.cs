@@ -19,13 +19,14 @@ public class Hackathon
             .Distinct()
             .Select(e => e.Id)
             .ToList();
-
-        return (from requestingEmployee in requestingEmployees
-            let deserializeAvailableEmployees = availableEmployeesIds
-                .OrderBy(_ => Guid.NewGuid())
-                .ToArray()
-            select new Wishlist(
-                requestingEmployee.Id,
-                deserializeAvailableEmployees)).ToList();
+        
+        return requestingEmployees
+            .Select(e => new Wishlist(
+                e.Id,
+                availableEmployeesIds
+                    .OrderBy(_ => Guid.NewGuid())
+                    .ToArray()
+            ))
+            .ToList();
     }
 }
