@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HrManager", "HrManager\HrManager.csproj", "{5685803E-3DEF-4F9C-8AEA-E464E3E1A07F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HrDirector", "HrDirector\HrDirector.csproj", "{76F7DD79-B269-43A3-8C36-E1F733087FCE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackathonContract", "HackathonContract\HackathonContract.csproj", "{428B1C56-B82C-4250-A62B-2E0E758137F3}"
@@ -12,16 +10,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackathonEveryone", "Hackat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackathonStrategy", "HackathonStrategy\HackathonStrategy.csproj", "{A4AF5E67-7274-4841-AA45-CB761F238920}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HrManager", "HrManager\HrManager.csproj", "{B57C6023-18C6-42B9-929D-FE1829365D26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5685803E-3DEF-4F9C-8AEA-E464E3E1A07F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5685803E-3DEF-4F9C-8AEA-E464E3E1A07F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5685803E-3DEF-4F9C-8AEA-E464E3E1A07F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5685803E-3DEF-4F9C-8AEA-E464E3E1A07F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{76F7DD79-B269-43A3-8C36-E1F733087FCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{76F7DD79-B269-43A3-8C36-E1F733087FCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76F7DD79-B269-43A3-8C36-E1F733087FCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,5 +38,9 @@ Global
 		{A4AF5E67-7274-4841-AA45-CB761F238920}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4AF5E67-7274-4841-AA45-CB761F238920}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4AF5E67-7274-4841-AA45-CB761F238920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B57C6023-18C6-42B9-929D-FE1829365D26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B57C6023-18C6-42B9-929D-FE1829365D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B57C6023-18C6-42B9-929D-FE1829365D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B57C6023-18C6-42B9-929D-FE1829365D26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
