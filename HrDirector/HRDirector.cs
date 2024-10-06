@@ -39,14 +39,14 @@ public sealed class HrDirector
         return CalculateHarmonic(totalSatisfactionScores);
     }
 
-    private double CalculateSatisfactionScore(int desiredEmployeeId, int[] wishlistIds)
+    public double CalculateSatisfactionScore(int desiredEmployeeId, int[] wishlistIds)
     {
         var rank = Array.IndexOf(wishlistIds, desiredEmployeeId);
         var countParticipants = wishlistIds.Length;
         return countParticipants - rank;
     }
 
-    private double CalculateHarmonic(IEnumerable<double> values)
+    public double CalculateHarmonic(IEnumerable<double> values)
     {
         var sumOfInverses = values.Sum(v => 1 / v);
         return values.Count() / sumOfInverses;

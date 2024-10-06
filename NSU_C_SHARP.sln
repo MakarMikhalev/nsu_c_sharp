@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackathonStrategy", "Hackat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HrManager", "HrManager\HrManager.csproj", "{B57C6023-18C6-42B9-929D-FE1829365D26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HackathonTest", "HackathonTest\HackathonTest.csproj", "{B316E12B-D1B5-4185-AAED-030D14CF71D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{B57C6023-18C6-42B9-929D-FE1829365D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B57C6023-18C6-42B9-929D-FE1829365D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B57C6023-18C6-42B9-929D-FE1829365D26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B316E12B-D1B5-4185-AAED-030D14CF71D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B316E12B-D1B5-4185-AAED-030D14CF71D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B316E12B-D1B5-4185-AAED-030D14CF71D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B316E12B-D1B5-4185-AAED-030D14CF71D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

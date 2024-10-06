@@ -4,7 +4,7 @@ namespace HackathonRunner;
 
 public class Hackathon
 {
-    public WishlistParticipants Start(IEnumerable<Employee> jEnumerable,
+    public virtual WishlistParticipants Start(IEnumerable<Employee> jEnumerable,
         IEnumerable<Employee> tEnumerable)
     {
         return new WishlistParticipants(

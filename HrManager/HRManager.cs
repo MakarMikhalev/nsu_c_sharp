@@ -13,7 +13,6 @@ public class HrManager(ITeamBuildingStrategy teamBuildingStrategy)
     {
         var requestingEmployees = juniors.ToArray();
         var availableEmployees = teamLeads.ToArray();
-
         var teams = teamBuildingStrategy.BuildTeams(
             requestingEmployees,
             availableEmployees,

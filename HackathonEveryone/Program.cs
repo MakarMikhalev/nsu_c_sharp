@@ -29,6 +29,7 @@ public static class Program
                 services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
                 services.AddTransient<HrManager>();
                 services.AddTransient<HrDirector>();
+                services.AddTransient<HackathonRunner>();
                 services.AddHostedService<HackathonWorker>();
             });
 }
