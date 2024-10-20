@@ -60,6 +60,8 @@ public class HrManagerTest
 
     private IEnumerable<Wishlist> GenerateWishlists(IEnumerable<Employee> employees)
     {
-        return employees.Select(jr => new Wishlist(jr.Id, [1, 2, 3]));
+        return employees.Select(jr => new Wishlist(jr.Id, DesiredEmployees));
     }
+
+    private static readonly int[] DesiredEmployees = { 1, 2, 3 };
 }

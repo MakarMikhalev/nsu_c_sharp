@@ -1,4 +1,5 @@
-using HackathonHrManager;
+
+using HackathonContract.Model;
 
 namespace HackathonHrDirector;
 

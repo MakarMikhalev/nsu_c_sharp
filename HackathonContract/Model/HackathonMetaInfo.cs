@@ -1,6 +1,4 @@
-using HackathonContract.Model;
-
-namespace HackathonHrManager;
+namespace HackathonContract.Model;
 
 public record HackathonMetaInfo(
     IEnumerable<Wishlist> TeamLeadsWishlists,
