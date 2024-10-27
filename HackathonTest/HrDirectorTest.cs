@@ -15,15 +15,15 @@ public class HrDirectorTest
         var hackathonMetaInfo = new HackathonMetaInfo(
             new List<Wishlist>
             {
-                new(1, [1, 2, 3]),
-                new(2, [3, 1, 2]),
-                new(3, [3, 2, 1])
+                new(1, DesiredEmployeeSet1),
+                new(2, DesiredEmployeeSet2),
+                new(3, DesiredEmployeeSet3)
             },
             new List<Wishlist>
             {
-                new(1, [1, 2, 3]),
-                new(2, [3, 1, 2]),
-                new(3, [3, 2, 1])
+                new(1, DesiredEmployeeSet1),
+                new(2, DesiredEmployeeSet2),
+                new(3, DesiredEmployeeSet3)
             },
             new List<Team>
             {
@@ -40,19 +40,24 @@ public class HrDirectorTest
         Assert.AreEqual(correctResult, result);
     }
 
+    private static readonly int[] WishlistIds = { 1, 2, 3 };
+    private static readonly int[] DesiredEmployeeSet1 = { 1, 2, 3 };
+    private static readonly int[] DesiredEmployeeSet2 = { 3, 1, 2 };
+    private static readonly int[] DesiredEmployeeSet3 = { 3, 2, 1 };
+
     [Test]
     public void CalculateSatisfactionScoreTest()
     {
         var hrDirector = new HrDirector();
-        var result = hrDirector.CalculateSatisfactionScore(3, [1, 2, 3]);
+        var result = hrDirector.CalculateSatisfactionScore(3, WishlistIds);
         Assert.AreEqual(1, result);
     }
-    
+
     [Test]
     public void CalculateHarmonicTest()
     {
         var hrDirector = new HrDirector();
-        var result = hrDirector.CalculateHarmonic([2, 6]);
+        var result = hrDirector.CalculateHarmonic(new List<double> { 2, 6 });
         Assert.AreEqual(3, result);
     }
 }

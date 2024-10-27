@@ -8,11 +8,17 @@
 
 <ItemGroup>
   <ProjectReference Include="..\HackathonContract\HackathonContract.csproj" />
+  <ProjectReference Include="..\HackathonDatabase\HackathonDatabase.csproj" />
 </ItemGroup>
 
 <ItemGroup>
+  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+  <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0-rc.2.24473.5" />
+  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-rc.2.24473.5" />
+  <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.2.24473.5" />
   <PackageReference Include="Moq" Version="4.20.72" />
   <PackageReference Include="MSTest.TestAdapter" Version="3.6.1" />
   <PackageReference Include="MSTest.TestFramework" Version="3.6.1" />
+  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.2" />
 </ItemGroup>
 </Project>
