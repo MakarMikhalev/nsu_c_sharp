@@ -77,7 +77,7 @@ public class HrManagerTest
         );
     }
 
-    private IEnumerable<Wishlist> GenerateWishlists(IEnumerable<Employee> employees)
+    private IEnumerable<Wishlist> GenerateWishlists(IEnumerable<Employee?> employees)
     {
         var desiredEmployees = ModelFactory.GenerateDesiredEmployees(3);
         return employees.Select(jr => new Wishlist(jr.Id, desiredEmployees));

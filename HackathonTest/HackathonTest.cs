@@ -1,4 +1,3 @@
-using HackathonContract.Model;
 using HackathonRunner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
