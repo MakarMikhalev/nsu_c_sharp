@@ -5,8 +5,8 @@ using HackathonDatabase.service;
 namespace HackathonHrDirector;
 
 public class HrDirectorService(
-    EmployeeService employeeService,
-    HackathonService hackathonService,
+    IEmployeeService employeeService,
+    IHackathonService hackathonService,
     HrDirector hrDirector)
 {
     public void SummingUp(HackathonResult hackathonResult)
@@ -16,7 +16,7 @@ public class HrDirectorService(
             EmployeeType.Junior
         );
         employeeService.SaveEmployeesByTypeAsync(
-            hackathonResult.JuniorEmployees,
+            hackathonResult.TeamLeadEmployees,
             EmployeeType.TeamLead
         );
 

@@ -36,6 +36,7 @@ public class Program
                 var context = serviceProvider.GetService<ApplicationDbContext>();
 
                 services.AddTransient<EmployeeService>();
+                services.AddTransient<HackathonService>();
                 services.AddTransient<HrDirector>();
                 services.AddTransient<HrDirectorService>();
                 services.AddTransient<HrDirectorController>();

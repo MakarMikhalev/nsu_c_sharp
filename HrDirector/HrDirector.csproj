@@ -5,11 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\HrManager\HrManager.csproj" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
@@ -18,6 +14,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\HackathonContract\HackathonContract.csproj" />
+    <ProjectReference Include="..\HackathonDatabase\HackathonDatabase.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,7 +18,6 @@ public sealed class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
         modelBuilder.Entity<EmployeeEntity>()
             .HasKey(e => new { e.Id, e.EmployeeType });
         
