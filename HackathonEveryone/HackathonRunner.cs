@@ -13,15 +13,15 @@ public class HackathonRunner
     private readonly HrManager _hrManager;
     private readonly HrDirector _hrDirector;
     private readonly Hackathon _hackathon;
-    private readonly HackathonService _hackathonService;
-    private readonly EmployeeService _employeeService;
+    private readonly IHackathonService _hackathonService;
+    private readonly IEmployeeService _employeeService;
 
     public HackathonRunner(
         HrManager hrManager,
         HrDirector hrDirector,
         Hackathon hackathon,
-        HackathonService hackathonService,
-        EmployeeService employeeService)
+        IHackathonService hackathonService,
+        IEmployeeService employeeService)
     {
         _hrManager = hrManager;
         _hrDirector = hrDirector;

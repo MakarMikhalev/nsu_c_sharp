@@ -1,19 +1,10 @@
 using HackathonContract.Model;
-using HackathonDatabase.mapper;
 using HackathonDatabase.model;
-using Microsoft.EntityFrameworkCore;
 
 namespace HackathonDatabase.service;
 
-public class HackathonService
+public class HackathonService(ApplicationDbContext applicationDbContext) : IHackathonService
 {
-    private readonly ApplicationDbContext _applicationDbContext;
-
-    public HackathonService(ApplicationDbContext applicationDbContext)
-    {
-        _applicationDbContext = applicationDbContext;
-    }
-
     public void SaveHackathon(double harmonicMean, HackathonMetaInfo hackathonMetaInfo)
     {
         var wishlists =
@@ -34,10 +25,10 @@ public class HackathonService
             }).ToList()
         };
 
-        _applicationDbContext.HackathonEntities.Add(hackathon);
+        applicationDbContext.HackathonEntities.Add(hackathon);
         try
         {
-            _applicationDbContext.SaveChanges();
+            applicationDbContext.SaveChanges();
         }
         catch
             (Exception ex)

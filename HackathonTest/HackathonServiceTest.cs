@@ -1,105 +1,93 @@
+using HackathonContract.Model;
+using HackathonDatabase;
+using HackathonDatabase.model;
+using HackathonDatabase.service;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using HackathonContract.Model;
-using HackathonDatabase.service;
 
-namespace HackathonDatabase.Tests
+namespace HackathonTest;
+
+[TestFixture]
+public class HackathonServiceTests
 {
-    public class HackathonServiceTests
+    private ApplicationDbContext _context;
+    private HackathonService _hackathonService;
+
+    private const double HarmonicMean = 4.5;
+
+    [SetUp]
+    public void Setup()
     {
-        private ApplicationDbContext _context;
-        private HackathonService _hackathonService;
+        var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
 
-        [SetUp]
-        public void Setup()
-        {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            connection.Open();
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseSqlite(connection)
+            .Options;
 
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseSqlite(connection)
-                .Options;
+        _context = new ApplicationDbContext(options);
+        _context.Database.EnsureCreated();
 
-            _context = new ApplicationDbContext(options);
-            _context.Database.EnsureCreated();
+        _hackathonService = new HackathonService(_context);
+    }
 
-            _hackathonService = new HackathonService(_context);
-        }
+    [TearDown]
+    public void TearDown()
+    {
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
+    }
 
-        [TearDown]
-        public void TearDown()
-        {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
-        }
+    [Test]
+    public void  Success_SaveHackathon_ShouldSaveToDatabase()
+    {
+        var hackathonMetaInfo = CreateHackathonMetaInfo();
 
-        [Test]
-        public void SaveHackathon_ShouldSaveToDatabase()
-        {
-            // Arrange
-            var harmonicMean = 4.5;
-            var hackathonMetaInfo = new HackathonMetaInfo(
-                TeamLeadsWishlists: new List<Wishlist>
-                {
-                    new Wishlist(1, new[] { 2, 3 })
-                },
-                JuniorsWishlists: new List<Wishlist>
-                {
-                    new Wishlist(2, new[] { 1 })
-                },
-                Teams: new List<Team>
-                {
-                    new Team(new Employee(1, "Lead1"), new Employee(2, "Junior1"))
-                }
-            );
+        _hackathonService.SaveHackathon(HarmonicMean, hackathonMetaInfo);
 
-            // Act
-            _hackathonService.SaveHackathon(harmonicMean, hackathonMetaInfo);
+        var savedHackathon = GetSavedHackathon();
+        AssertionResult(savedHackathon);
+    }
 
-            // Assert
-            var savedHackathon = _context.HackathonEntities
-                .Include(h => h.Teams)
-                .Include(h => h.Wishlists)
-                .FirstOrDefault();
+    [Test]
+    public void  Success_GetHackathon_ShouldReturnSavedHackathonFromDatabase()
+    {
+        var hackathonMetaInfo = CreateHackathonMetaInfo();
+        _hackathonService.SaveHackathon(HarmonicMean, hackathonMetaInfo);
 
-            Assert.IsNotNull(savedHackathon);
-            Assert.AreEqual(harmonicMean, savedHackathon.HarmonicMean);
-            Assert.AreEqual(1, savedHackathon.Teams.Count);
-            Assert.AreEqual(2, savedHackathon.Wishlists.Count);
-        }
+        var savedHackathon = GetSavedHackathon();
 
-        [Test]
-        public void GetHackathon_ShouldReturnCorrectDataFromDatabase()
-        {
-            // Arrange
-            var harmonicMean = 4.5;
-            var hackathonMetaInfo = new HackathonMetaInfo(
-                TeamLeadsWishlists: new List<Wishlist>
-                {
-                    new Wishlist(1, new[] { 2, 3 })
-                },
-                JuniorsWishlists: new List<Wishlist>
-                {
-                    new Wishlist(2, new[] { 1 })
-                },
-                Teams: new List<Team>
-                {
-                    new Team(new Employee(1, "Lead1"), new Employee(2, "Junior1"))
-                }
-            );
-            _hackathonService.SaveHackathon(harmonicMean, hackathonMetaInfo);
+        AssertionResult(savedHackathon);
+    }
 
-            // Act
-            var savedHackathon = _context.HackathonEntities
-                .Include(h => h.Teams)
-                .Include(h => h.Wishlists)
-                .FirstOrDefault();
+    private HackathonMetaInfo CreateHackathonMetaInfo()
+    {
+        return new HackathonMetaInfo(
+            TeamLeadsWishlists: new List<Wishlist>
+            {
+                new(1, new[] { 2, 3 })
+            },
+            JuniorsWishlists: new List<Wishlist>
+            {
+                new(2, new[] { 1 })
+            },
+            Teams: ModelFactory.GenerateTeams(1)
+        );
+    }
 
-            // Assert
-            Assert.IsNotNull(savedHackathon);
-            Assert.AreEqual(4.5, savedHackathon.HarmonicMean);
-            Assert.AreEqual(1, savedHackathon.Teams.Count);
-            Assert.AreEqual(2, savedHackathon.Wishlists.Count);
-        }
+    private HackathonEntity GetSavedHackathon()
+    {
+        return _context.HackathonEntities
+            .Include(h => h.Teams)
+            .Include(h => h.Wishlists)
+            .FirstOrDefault();
+    }
+
+    private void AssertionResult(HackathonEntity savedHackathon)
+    {
+        Assert.IsNotNull(savedHackathon);
+        Assert.AreEqual(HarmonicMean, savedHackathon.HarmonicMean);
+        Assert.AreEqual(1, savedHackathon.Teams.Count);
+        Assert.AreEqual(2, savedHackathon.Wishlists.Count);
     }
 }

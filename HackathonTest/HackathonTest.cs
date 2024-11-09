@@ -1,3 +1,4 @@
+using HackathonDatabase.model;
 using HackathonRunner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
@@ -8,49 +9,66 @@ namespace HackathonTest;
 [TestClass]
 public class HackathonTest
 {
-    [Test]
-    public void CreateWishlistTest()
-    {
-        Hackathon hackathon = new Hackathon();
-        var jEnumerable = GeneratorEmployer.GenerateJuniorEntitys();
-        var sEnumerator = GeneratorEmployer.GenerateSeniorEntitys();
+    private Hackathon _hackathon;
+    private IEnumerable<EmployeeEntity> _juniors;
+    private IEnumerable<EmployeeEntity> _seniors;
 
-        var wishlist = hackathon.Start(jEnumerable, sEnumerator);
+    [SetUp]
+    public void Setup()
+    {
+        _hackathon = new Hackathon();
+        _juniors = ModelFactory.GenerateEmployeeEntities(3, "Junior");
+        _seniors = ModelFactory.GenerateEmployeeEntities(3, "Senior");
+    }
+
+    [Test]
+    public void Success_CreateWishlist_ShouldCreateWishlistsForJuniorsAndSeniors()
+    {
+        // Arrange & Act
+        var wishlist = _hackathon.Start(_juniors, _seniors);
+
+        // Assert
+        AssertWishlist(wishlist);
+    }
+
+    [Test]
+    public void Success_CreateWishlistDesiredEmployees_ShouldContainAllTeamLeadsInJuniorWishlists()
+    {
+        // Arrange & Act
+        var wishlist = _hackathon.Start(_juniors, _seniors);
+
+        // Assert
+        AssertDesiredEmployees(wishlist);
+    }
+
+    private void AssertWishlist(WishlistParticipants wishlist)
+    {
         Assert.AreEqual(3, wishlist.TeamLeadsWishlists.Count());
         Assert.AreEqual(3, wishlist.JuniorsWishlists.Count());
 
         var teamLeadsWishlists = wishlist.TeamLeadsWishlists.Select(w => w.EmployeeId);
-        var teamLeads = sEnumerator.Select(e => e.Id);
+        var teamLeads = _seniors.Select(e => e.Id);
         Assert.IsTrue(teamLeadsWishlists.SequenceEqual(teamLeads));
 
         var juniorsWishlists = wishlist.JuniorsWishlists.Select(w => w.EmployeeId);
-        var juniors = jEnumerable.Select(e => e.Id);
+        var juniors = _juniors.Select(e => e.Id);
         Assert.IsTrue(juniorsWishlists.SequenceEqual(juniors));
     }
 
-    [Test]
-    public void CreateWishlistDesiredEmployeesTest()
+    private void AssertDesiredEmployees(WishlistParticipants wishlist)
     {
-        var hackathon = new Hackathon();
-        var jEnumerable = GeneratorEmployer.GenerateJuniorEntitys();
-        var sEnumerator = GeneratorEmployer.GenerateSeniorEntitys();
-
-        var wishlist = hackathon.Start(jEnumerable, sEnumerator);
-
         foreach (var juniorWishlist in wishlist.JuniorsWishlists)
         {
             var desiredEmployees = juniorWishlist.DesiredEmployees;
-            var teamLeadsIds = sEnumerator
-                .Select(e => e.Id)
-                .Distinct()
-                .ToArray();
+            var teamLeadsIds = _seniors.Select(e => e.Id).Distinct().ToArray();
 
             Assert.AreEqual(teamLeadsIds.Length,
                 desiredEmployees.Length,
-                "Количество team lead-ов должно соответсвовать количетсву juniors");
+                "Количество team lead-ов должно соответсвовать количеству juniors");
+
             CollectionAssert.AreEquivalent(teamLeadsIds,
                 desiredEmployees,
-                "Все участники должны присутсвтовать в списке juniors");
+                "Все участники должны присутствовать в списке juniors");
         }
     }
 }
