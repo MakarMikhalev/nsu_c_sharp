@@ -8,15 +8,11 @@ public static class EnumExtensions
 {
     public static EmployeeType GetEmployeeTypeByDisplayName(string displayName)
     {
-        foreach (var field in typeof(EmployeeType).GetFields())
+        return displayName.ToUpper() switch
         {
-            var attribute = field.GetCustomAttribute<DisplayNameAttribute>();
-            if (attribute != null &&
-                attribute.Name.Equals(displayName, StringComparison.OrdinalIgnoreCase))
-            {
-                return (EmployeeType)field.GetValue(null);
-            }
-        }
-        throw new InvalidEnumArgumentException();
+            "JUNIOR" => EmployeeType.Junior,
+            "TEAMLEAD" => EmployeeType.TeamLead,
+            _ => throw new InvalidEnumArgumentException($"Invalid display name: {displayName}")
+        };
     }
 }

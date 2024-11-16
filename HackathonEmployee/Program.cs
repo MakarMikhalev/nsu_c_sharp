@@ -10,43 +10,46 @@ namespace HackthonEmployee;
 
 public class Program
 {
-    private const int INDEX_VALUE = 1;
-
     private static readonly HttpClient Client = new();
 
-    public static async Task Main(string[] args)
+    public static async Task Main()
     {
-        try
-        {
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
+        Console.WriteLine("Start task create employee");
 
-            var type = Array.Find(args, a => a.StartsWith("type="))?.Split('=')[INDEX_VALUE];
-            var id = int.Parse(
-                Array.Find(args, a => a.StartsWith("id="))?.Split('=')[INDEX_VALUE] ??
-                string.Empty);
+        Console.WriteLine(Environment.GetEnvironmentVariable("EMPLOYER_TYPE"));
+        Console.WriteLine(Environment.GetEnvironmentVariable("EMPLOYER_ID"));
 
-            var juniorFile = configuration["HackathonSettings:JuniorFile"];
-            var teamLeadFile = configuration["HackathonSettings:TeamLeadFile"];
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .Build();
 
-            var content = new StringContent(JsonSerializer.Serialize(
-                    CreateWishlist(id, type, juniorFile, teamLeadFile)),
-                Encoding.UTF8,
-                "application/json"
-            );
-            
-            var url = $"http://localhost:/api/send_wishlist?type={type}";
-            var response = await Client.PostAsync(url, content);
-            response.EnsureSuccessStatusCode();
+        var type = Environment.GetEnvironmentVariable("EMPLOYER_TYPE");
+        var id = int.Parse(Environment.GetEnvironmentVariable("EMPLOYER_ID"));
 
-            var responseBody = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(responseBody);
-        }
-        catch (HttpRequestException e)
-        {
-            Console.WriteLine($"Ошибка запроса: {e.Message}");
-        }
+        Console.WriteLine("Employee id: " + id + "  type: " + type);
+
+        var juniorFile = configuration["HackathonSettings:JuniorFile"];
+        var teamLeadFile = configuration["HackathonSettings:TeamLeadFile"];
+
+        var content = new StringContent(JsonSerializer.Serialize(
+                CreateWishlist(id, type, juniorFile, teamLeadFile)),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        await SendRequest(type, content);
+    }
+
+    private static async Task SendRequest(string type, StringContent content)
+    {
+        var url = $"http://hrManager:8081/api/send_wishlist?type=" + type;
+        Console.WriteLine("Url " + url);
+        var response = await Client.PostAsync(url, content);
+        response.EnsureSuccessStatusCode();
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(responseBody);
     }
 
     private static Wishlist? CreateWishlist(
@@ -55,6 +58,7 @@ public class Program
         string juniorFile,
         string teamLeadFile)
     {
+        Console.WriteLine("Create wish list");
         var employeeType = EnumExtensions.GetEmployeeTypeByDisplayName(type);
         return employeeType switch
         {
