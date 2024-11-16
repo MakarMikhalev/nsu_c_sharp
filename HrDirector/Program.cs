@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace HackathonHrDirector;
 
 using Microsoft.Extensions.Configuration;
@@ -11,35 +13,53 @@ public class Program
 {
     public static void Main()
     {
-        CreateHostBuilder().Build().RunAsync();
+        CreateHostBuilder().Build().Run();
     }
 
     private static IHostBuilder CreateHostBuilder() =>
         Host.CreateDefaultBuilder()
-            .ConfigureAppConfiguration(config =>
+            .ConfigureWebHost(webBuilder =>
             {
-                config.SetBasePath(Directory.GetCurrentDirectory());
-                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-            })
-            .ConfigureServices(services =>
-            {
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json")
-                    .Build();
+                webBuilder.UseKestrel(options => { options.Listen(IPAddress.Any, 8080); })
+                    .ConfigureAppConfiguration(config =>
+                    {
+                        config.SetBasePath(Directory.GetCurrentDirectory());
+                        config.AddJsonFile("appsettings.json", optional: true,
+                            reloadOnChange: true);
+                    })
+                    .ConfigureAppConfiguration(config =>
+                    {
+                        config.SetBasePath(Directory.GetCurrentDirectory());
+                        config.AddJsonFile("appsettings.json", optional: true,
+                            reloadOnChange: true);
+                    })
+                    .ConfigureServices(services =>
+                    {
+                        var configuration = new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.json")
+                            .Build();
 
-                var serviceProvider = new ServiceCollection()
-                    .AddDbContext<ApplicationDbContext>(options =>
-                        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")))
-                    .BuildServiceProvider();
+                        var serviceProvider = new ServiceCollection()
+                            .AddDbContext<ApplicationDbContext>(options =>
+                                options.UseNpgsql(
+                                    configuration.GetConnectionString("DefaultConnection")))
+                            .BuildServiceProvider();
 
-                var context = serviceProvider.GetService<ApplicationDbContext>();
+                        var context = serviceProvider.GetService<ApplicationDbContext>();
 
-                services.AddTransient<EmployeeService>();
-                services.AddTransient<HackathonService>();
-                services.AddTransient<HrDirector>();
-                services.AddTransient<HrDirectorService>();
-                services.AddTransient<HrDirectorController>();
-                services.AddSingleton(context);
+                        services.AddTransient<IEmployeeService, EmployeeService>();
+                        services.AddTransient<IHackathonService, HackathonService>();
+                        services.AddTransient<HrDirector>();
+                        services.AddTransient<HrDirectorService>();
+                        services.AddTransient<HrDirectorController>();
+                        services.AddSingleton(context);
+                        services.AddControllers();
+                    })
+                    .Configure(app =>
+                    {
+                        app.UseRouting();
+                        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+                    });
             });
 }

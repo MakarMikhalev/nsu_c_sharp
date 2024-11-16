@@ -1,5 +1,7 @@
 using HackathonDatabase.model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace HackathonDatabase;
 

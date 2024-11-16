@@ -3,7 +3,6 @@ using HackathonContract.Model;
 using HackathonContract.Model.Enum;
 using HackathonDatabase.model;
 using HackathonEveryone.Utils;
-using Microsoft.Testing.Platform.Configurations;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace HackathonHrManager;
@@ -11,8 +10,6 @@ namespace HackathonHrManager;
 public class HrManagerService
 {
     private int countParticipants;
-    private int countCurrentParticipants;
-    private readonly object _lockObj = new();
     private List<Wishlist> jWishlists = new();
     private List<Wishlist> tWishlists = new();
 
@@ -33,41 +30,52 @@ public class HrManagerService
         countParticipants = jEmployees.Count + tEmployees.Count;
     }
 
-    public void tryStartHackathon(string type, Wishlist wishlist)
+    public async Task tryStartHackathon(string type, Wishlist wishlist)
     {
-        lock (_lockObj)
+        Console.WriteLine("Try start hackathon, type: " + type);
+        switch (EnumExtensions.GetEmployeeTypeByDisplayName(type))
         {
-            switch (EnumExtensions.GetEmployeeTypeByDisplayName(type))
+            case EmployeeType.Junior:
+                jWishlists.Add(wishlist);
+                break;
+            case EmployeeType.TeamLead:
+                tWishlists.Add(wishlist);
+                break;
+        }
+
+        Console.WriteLine("junior count " + jWishlists.Count);
+        Console.WriteLine("team lead count " + tWishlists.Count);
+        var countCurrentParticipants = jWishlists.Count + tWishlists.Count;
+        Console.WriteLine("Update statistic: " + countCurrentParticipants);
+
+        if (countCurrentParticipants == countParticipants)
+        {
+            Console.WriteLine("Start organize hackathon");
+            var hackathonMetaInfo = _hrManager.OrganizeHackathon(
+                jEmployees,
+                tEmployees,
+                tWishlists,
+                jWishlists
+            );
+
+            var requestBody = new HackathonResult(
+                jEmployees,
+                tEmployees,
+                hackathonMetaInfo
+            );
+            var content = new StringContent(JsonSerializer.Serialize(requestBody),
+                Encoding.UTF8,
+                "application/json"
+            );
+            var response = await Client.PostAsync($"http://hrDirector:8080/api/send_hackathon", content);
+
+            if (response.IsSuccessStatusCode)
             {
-                case EmployeeType.Junior:
-                    jWishlists.Add(wishlist);
-                    break;
-                case EmployeeType.TeamLead:
-                    tWishlists.Add(wishlist);
-                    break;
+                Console.WriteLine("Request sent successfully.");
             }
-
-            ++countCurrentParticipants;
-
-            if (countParticipants == countCurrentParticipants)
+            else
             {
-                var hackathonMetaInfo = _hrManager.OrganizeHackathon(
-                    jEmployees,
-                    tEmployees,
-                    tWishlists,
-                    jWishlists
-                );
-
-                var requestBody = new HackathonResult(
-                    jEmployees,
-                    tEmployees,
-                    hackathonMetaInfo
-                );
-                var content = new StringContent(JsonSerializer.Serialize(requestBody),
-                    Encoding.UTF8,
-                    "application/json"
-                );
-                Client.PostAsync($"http://localhost:/api/send_hackathon", content);
+                Console.WriteLine($"Error sending request: {response.StatusCode}");
             }
         }
     }
