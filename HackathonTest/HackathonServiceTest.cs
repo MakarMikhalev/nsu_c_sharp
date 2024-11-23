@@ -42,7 +42,7 @@ public class HackathonServiceTests
     public void  Success_SaveHackathon_ShouldSaveToDatabase()
     {
         var hackathonMetaInfo = CreateHackathonMetaInfo();
-        
+        SaveEmployees(new List<int> { 1, 2, 3 });
         _hackathonService.SaveHackathon(HarmonicMean, hackathonMetaInfo);
 
         var savedHackathon = GetSavedHackathon();
@@ -78,5 +78,26 @@ public class HackathonServiceTests
         Assert.AreEqual(HarmonicMean, savedHackathon.HarmonicMean);
         Assert.AreEqual(1, savedHackathon.Teams.Count);
         Assert.AreEqual(2, savedHackathon.Wishlists.Count);
+    }
+    
+    private void SaveEmployees(List<int> employeeIds)
+    {
+        foreach (var employeeId in employeeIds)
+        {
+            var existingEmployee = _context.EmployeeEntities
+                .FirstOrDefault(e => e.Id == employeeId);
+        
+            if (existingEmployee == null)
+            {
+                var employee = new EmployeeEntity 
+                { 
+                    Id = employeeId,
+                    Name = $"Employee {employeeId}"
+                };
+                _context.EmployeeEntities.Add(employee);
+            }
+        }
+
+        _context.SaveChanges();
     }
 }

@@ -27,15 +27,7 @@ public class HackathonService(ApplicationDbContext applicationDbContext) : IHack
         };
 
         applicationDbContext.HackathonEntities.Add(hackathon);
-        try
-        {
-            applicationDbContext.SaveChanges();
-        }
-        catch
-            (Exception ex)
-        {
-            Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
-        }
+        applicationDbContext.SaveChanges();
         return hackathon.Id;
     }
 
