@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HackathonContract.Model;
 
 namespace HackathonDatabase.model;
 
@@ -13,7 +12,7 @@ public class HackathonEntity
 
     public double HarmonicMean { get; set; }
 
-    public List<TeamEntity> Teams { get; set; }
+    public List<TeamEntity> Teams { get; set; } = [];
 
-    public List<WishlistEntity> Wishlists { get; set; }
+    public List<WishlistEntity> Wishlists { get; set; } = [];
 }

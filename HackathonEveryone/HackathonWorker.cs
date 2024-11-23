@@ -37,30 +37,17 @@ public class HackathonWorker : IHostedService
             var teamLeadFile = _configuration["HackathonSettings:TeamLeadFile"];
             var countIteration =
                 int.Parse(_configuration["HackathonSettings:CountIteration"] ?? string.Empty);
-
-            var harmonicsResults = new List<double>();
+            
             var juniors = ParseCsv.RunAsync(juniorFile);
             var teamLeads = ParseCsv.RunAsync(teamLeadFile);
             for (var i = 1; i <= countIteration; ++i)
             {
-                var harmonic = _hackathonRunner.Run(juniors, teamLeads);
-                harmonicsResults.Add(harmonic);
-                PrintHarmonicResult(harmonicsResults, i);
+                _hackathonRunner.Run(juniors, teamLeads);
             }
-
-            PrintHarmonicResult(harmonicsResults, countIteration);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Run: message exception: {ex.Message}");
         }
-    }
-
-    private static void PrintHarmonicResult(IEnumerable<double> harmonicsResults,
-        int countIteration)
-    {
-        Console.WriteLine("_________________________________________________________");
-        Console.WriteLine(
-            $"Harmonic mean = {harmonicsResults.Sum() / countIteration} for {countIteration} iteration(s)");
     }
 }

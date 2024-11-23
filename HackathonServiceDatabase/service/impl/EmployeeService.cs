@@ -1,5 +1,4 @@
 using HackathonContract.Model;
-using HackathonDatabase.mapper;
 using HackathonDatabase.model;
 
 namespace HackathonDatabase.service;
@@ -17,7 +16,13 @@ public class EmployeeService(ApplicationDbContext applicationDbContext) : IEmplo
 
         var newEmployees = entities
             .Where(e => !existingEmployees.Any(existing => existing.Id == e.Id))
-            .Select(e => EmployeeMapper.Entity(e, employeeType))
+            .Select(e => new EmployeeEntity
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    EmployeeType = employeeType
+                }
+            )
             .ToList();
 
         if (newEmployees.Any())
@@ -25,12 +30,5 @@ public class EmployeeService(ApplicationDbContext applicationDbContext) : IEmplo
             applicationDbContext.EmployeeEntities.AddRange(newEmployees);
             applicationDbContext.SaveChanges();
         }
-    }
-
-    public List<EmployeeEntity> GetEmployeeByType(EmployeeType employeeType)
-    {
-        return applicationDbContext.EmployeeEntities
-            .Where(e => e.EmployeeType == employeeType)
-            .ToList();
     }
 }

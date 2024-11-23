@@ -10,11 +10,12 @@ public class WishlistEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    public int employeeId { get; set; }
+    public int EmployeeId { get; set; }
     
-    public List<int> DesiredEmployeeIds { get; set; } = new();
+    public List<int> DesiredEmployeeIds { get; set; } = [];
     
+    [ForeignKey(nameof(Hackathon))]
     public int HackathonId { get; set; }
     
-    public HackathonEntity Hackathon { get; set; }
+    public HackathonEntity Hackathon { get; set; } = null!;
 }

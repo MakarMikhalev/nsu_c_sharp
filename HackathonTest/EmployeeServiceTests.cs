@@ -27,21 +27,7 @@ public class EmployeeServiceTests
 
         AssertEmployeesSaved(employeeType, 2);
     }
-
-    [Fact]
-    public void GetEmployeeByType_ShouldReturnEmployees_WhenEmployeeTypeIsMatched()
-    {
-        var employeeType = EmployeeType.JUNIOR;
-        var employees = ModelFactory.GenerateEmployees(3);
-
-        _employeeService.SaveEmployeesByTypeAsync(employees, employeeType);
-
-        var result = _employeeService.GetEmployeeByType(employeeType);
-
-        Assert.Equal(3, result.Count);
-        Assert.All(result, e => Assert.Equal(employeeType, e.EmployeeType));
-    }
-
+    
     private ApplicationDbContext SetupInMemoryDatabase()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()

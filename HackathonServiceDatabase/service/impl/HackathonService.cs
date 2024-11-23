@@ -1,11 +1,12 @@
 using HackathonContract.Model;
 using HackathonDatabase.model;
+using Microsoft.EntityFrameworkCore;
 
 namespace HackathonDatabase.service;
 
 public class HackathonService(ApplicationDbContext applicationDbContext) : IHackathonService
 {
-    public void SaveHackathon(double harmonicMean, HackathonMetaInfo hackathonMetaInfo)
+    public int SaveHackathon(double harmonicMean, HackathonMetaInfo hackathonMetaInfo)
     {
         var wishlists =
             hackathonMetaInfo.JuniorsWishlists.Concat(hackathonMetaInfo.TeamLeadsWishlists);
@@ -20,7 +21,7 @@ public class HackathonService(ApplicationDbContext applicationDbContext) : IHack
             }).ToList(),
             Wishlists = wishlists.Select(w => new WishlistEntity
             {
-                employeeId = w.EmployeeId,
+                EmployeeId = w.EmployeeId,
                 DesiredEmployeeIds = w.DesiredEmployees.ToList()
             }).ToList()
         };
@@ -35,5 +36,22 @@ public class HackathonService(ApplicationDbContext applicationDbContext) : IHack
         {
             Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
         }
+        return hackathon.Id;
+    }
+
+    public HackathonEntity GetHackathonById(int id)
+    {
+        Console.WriteLine("");
+        return applicationDbContext.HackathonEntities
+            .Include(h => h.Teams)
+            .Include(h => h.Wishlists)
+            .FirstOrDefault(h => h.Id == id);
+    }
+    
+    public double CalculateAverageHarmonicMean()
+    {
+        return applicationDbContext.HackathonEntities
+            .Select(h => h.HarmonicMean)
+            .ToList().Average();
     }
 }

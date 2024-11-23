@@ -9,6 +9,7 @@ using HackathonDatabase;
 using HackathonDatabase.service;
 using HackathonStrategy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HackathonEveryone;
 
@@ -16,7 +17,7 @@ public static class Program
 {
     public static void Main()
     {
-        CreateHostBuilder().Build().RunAsync();
+        CreateHostBuilder().Build().Run();
     }
 
     private static IHostBuilder CreateHostBuilder() =>
@@ -44,9 +45,9 @@ public static class Program
                 services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
                 services.AddTransient<HrManager>();
                 services.AddTransient<HrDirector>();
+                services.AddTransient<IHackathonService, HackathonService>();
+                services.AddTransient<IEmployeeService, EmployeeService>();
                 services.AddTransient<HackathonRunner>();
-                services.AddTransient<HackathonService>();
-                services.AddTransient<EmployeeService>();
                 services.AddHostedService<HackathonWorker>();
                 services.AddSingleton(context);
             });

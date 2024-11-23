@@ -1,4 +1,4 @@
-using HackathonDatabase.model;
+using HackathonContract.Model;
 using HackathonRunner;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
@@ -10,15 +10,15 @@ namespace HackathonTest;
 public class HackathonTest
 {
     private Hackathon _hackathon;
-    private IEnumerable<EmployeeEntity> _juniors;
-    private IEnumerable<EmployeeEntity> _seniors;
+    private IEnumerable<Employee> _juniors;
+    private IEnumerable<Employee> _seniors;
 
     [SetUp]
     public void Setup()
     {
         _hackathon = new Hackathon();
-        _juniors = ModelFactory.GenerateEmployeeEntities(3, "Junior");
-        _seniors = ModelFactory.GenerateEmployeeEntities(3, "Senior");
+        _juniors = ModelFactory.GenerateEmployees(3, "Junior");
+        _seniors = ModelFactory.GenerateEmployees(3, "Senior");
     }
 
     [Test]

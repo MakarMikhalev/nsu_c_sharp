@@ -23,9 +23,9 @@ public class HackathonRunnerTest
         WishlistParticipants wishlistParticipants,
         double expectedResult)
     {
-        var hackathon = CreateMockHackathon(jEmployeeEntities, tEmployeeEntities, wishlistParticipants);
+        var hackathon = CreateMockHackathon(jEmployees, tEmployees, wishlistParticipants);
         var hackathonService = CreateMockHackathonService();
-        var employeeService = CreateMockEmployeeService(jEmployeeEntities, tEmployeeEntities);
+        var employeeService = CreateMockEmployeeService();
 
         var hackathonRunner = CreateHackathonRunner(hackathon, hackathonService, employeeService);
 
@@ -35,12 +35,12 @@ public class HackathonRunnerTest
     }
 
     private Mock<Hackathon> CreateMockHackathon(
-        List<EmployeeEntity> jEmployeeEntities,
-        List<EmployeeEntity> tEmployeeEntities,
+        List<Employee> jEmployee,
+        List<Employee> tEmployee,
         WishlistParticipants wishlistParticipants)
     {
         var hackathon = new Mock<Hackathon>(MockBehavior.Strict);
-        hackathon.Setup(h => h.Start(jEmployeeEntities, tEmployeeEntities))
+        hackathon.Setup(h => h.Start(jEmployee, tEmployee))
             .Returns(wishlistParticipants);
         return hackathon;
     }
@@ -50,25 +50,23 @@ public class HackathonRunnerTest
         var hackathonService = new Mock<IHackathonService>(MockBehavior.Strict);
         hackathonService
             .Setup(h => h.SaveHackathon(It.IsAny<double>(), It.IsAny<HackathonMetaInfo>()))
+            .Returns(1)
             .Verifiable();
+        hackathonService.Setup(h => h.GetHackathonById(It.IsAny<int>()))
+            .Returns((HackathonEntity)null);
+        
+        hackathonService.Setup(h => h.CalculateAverageHarmonicMean())
+            .Returns(1.0);
         return hackathonService;
     }
 
-    private Mock<IEmployeeService> CreateMockEmployeeService(
-        List<EmployeeEntity> jEmployeeEntities,
-        List<EmployeeEntity> tEmployeeEntities)
+    private Mock<IEmployeeService> CreateMockEmployeeService()
     {
         var employeeService = new Mock<IEmployeeService>(MockBehavior.Strict);
 
         employeeService.Setup(h =>
                 h.SaveEmployeesByTypeAsync(It.IsAny<ICollection<Employee>>(),
-                    It.IsAny<EmployeeType>()))
-            .Verifiable();
-        employeeService.Setup(h => h.GetEmployeeByType(EmployeeType.JUNIOR))
-            .Returns(jEmployeeEntities);
-        employeeService.Setup(h => h.GetEmployeeByType(EmployeeType.TEAM_LEAD))
-            .Returns(tEmployeeEntities);
-
+                    It.IsAny<EmployeeType>()));
         return employeeService;
     }
 

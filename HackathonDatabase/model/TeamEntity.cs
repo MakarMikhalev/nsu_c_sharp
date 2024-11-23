@@ -11,10 +11,18 @@ public class TeamEntity
     public int Id { get; set; }
 
     public int TeamLeadId { get; set; }
+    
+    public EmployeeType TeamLeadEmployeeType { get; set; }
+    
+    public EmployeeEntity TeamLead { get; }
 
     public int JuniorId { get; set; }
     
-    public int HackathonId { get; set; }
+    public EmployeeType JuniorEmployeeType { get; set; }
     
-    public HackathonEntity Hackathon { get; set; }
+    public EmployeeEntity Junior { get; }
+
+    [ForeignKey(nameof(Hackathon))] public int HackathonId { get; set; }
+
+    public HackathonEntity Hackathon { get; set; } = null!;
 }

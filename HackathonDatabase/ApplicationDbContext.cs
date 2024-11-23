@@ -21,5 +21,18 @@ public sealed class ApplicationDbContext : DbContext
         
         modelBuilder.Entity<EmployeeEntity>()
             .HasKey(e => new { e.Id, e.EmployeeType });
+        
+        modelBuilder.Entity<TeamEntity>()
+            .HasOne(t => t.TeamLead)
+            .WithMany() 
+            .HasForeignKey(t => new { t.TeamLeadId, t.TeamLeadEmployeeType })
+            .OnDelete(DeleteBehavior.Restrict);  
+
+        modelBuilder.Entity<TeamEntity>()
+            .HasOne(t => t.Junior)
+            .WithMany() 
+            .HasForeignKey(t => new
+                { t.JuniorId, t.JuniorEmployeeType }) 
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

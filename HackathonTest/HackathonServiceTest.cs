@@ -42,24 +42,13 @@ public class HackathonServiceTests
     public void  Success_SaveHackathon_ShouldSaveToDatabase()
     {
         var hackathonMetaInfo = CreateHackathonMetaInfo();
-
+        
         _hackathonService.SaveHackathon(HarmonicMean, hackathonMetaInfo);
 
         var savedHackathon = GetSavedHackathon();
         AssertionResult(savedHackathon);
     }
-
-    [Test]
-    public void  Success_GetHackathon_ShouldReturnSavedHackathonFromDatabase()
-    {
-        var hackathonMetaInfo = CreateHackathonMetaInfo();
-        _hackathonService.SaveHackathon(HarmonicMean, hackathonMetaInfo);
-
-        var savedHackathon = GetSavedHackathon();
-
-        AssertionResult(savedHackathon);
-    }
-
+    
     private HackathonMetaInfo CreateHackathonMetaInfo()
     {
         return new HackathonMetaInfo(

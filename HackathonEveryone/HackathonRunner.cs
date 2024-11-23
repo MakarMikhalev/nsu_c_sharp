@@ -33,16 +33,51 @@ public class HackathonRunner
     public double Run(List<Employee> juniors, List<Employee> teamLeads)
     {
         _employeeService.SaveEmployeesByTypeAsync(juniors, EmployeeType.JUNIOR);
-        var jEntity = _employeeService.GetEmployeeByType(EmployeeType.JUNIOR);
-        
         _employeeService.SaveEmployeesByTypeAsync(juniors, EmployeeType.TEAM_LEAD);
-        var tEntity = _employeeService.GetEmployeeByType(EmployeeType.TEAM_LEAD);
 
-        var wishlistParticipants = _hackathon.Start(jEntity, tEntity);
+        var wishlistParticipants = _hackathon.Start(juniors, teamLeads);
         var teams = _hrManager.OrganizeHackathon(juniors, teamLeads, wishlistParticipants);
-        Console.WriteLine("Mean harmonic " + _hrDirector.CalculateMeanHarmonic(teams));
-        var harmonicMean = _hrDirector.CalculateMeanHarmonic(teams); 
-        _hackathonService.SaveHackathon(harmonicMean, teams);
+        var harmonicMean = _hrDirector.CalculateMeanHarmonic(teams);
+        var hackathonId = _hackathonService.SaveHackathon(harmonicMean, teams);
+        PrintHackathonResult(hackathonId);
+        PrintHarmonicMeanHackathon();
         return harmonicMean;
+    }
+
+    private void PrintHackathonResult(int hackathonId)
+    {
+        var hackathonEntity = _hackathonService.GetHackathonById(hackathonId);
+        if (hackathonEntity == null)
+        {
+            Console.WriteLine($"Hackathon with ID {hackathonId} not found.");
+            return;
+        }
+
+        Console.WriteLine("_________________________________________________________");
+        Console.WriteLine($"Hackathon Results (ID: {hackathonId}):");
+        Console.WriteLine($"Harmonic mean (from database): {hackathonEntity.HarmonicMean}");
+
+        Console.WriteLine("Formed Teams:");
+        foreach (var team in hackathonEntity.Teams)
+        {
+            Console.WriteLine($" - Team Lead ID: {team.TeamLeadId}, Junior ID: {team.JuniorId}");
+        }
+
+        Console.WriteLine("_________________________________________________________");
+
+        Console.WriteLine("Participant Wishlists:");
+        foreach (var wishlist in hackathonEntity.Wishlists)
+        {
+            Console.WriteLine(
+                $" - Participant ID: {wishlist.EmployeeId}, Desired Colleagues: {string.Join(", ", wishlist.DesiredEmployeeIds)}");
+        }
+    }
+
+    private void PrintHarmonicMeanHackathon()
+    {
+        Console.WriteLine("_________________________________________________________");
+        Console.WriteLine(
+            $"Average Harmonic Mean for all hackathons: {_hackathonService.CalculateAverageHarmonicMean()}");
+        Console.WriteLine("_________________________________________________________");
     }
 }
