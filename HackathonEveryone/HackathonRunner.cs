@@ -32,8 +32,8 @@ public class HackathonRunner
 
     public double Run(List<Employee> juniors, List<Employee> teamLeads)
     {
-        _employeeService.SaveEmployeesByTypeAsync(juniors, EmployeeType.JUNIOR);
-        _employeeService.SaveEmployeesByTypeAsync(juniors, EmployeeType.TEAM_LEAD);
+        _employeeService.SaveEmployeesByTypeAsync(juniors, EmployeeType.Junior);
+        _employeeService.SaveEmployeesByTypeAsync(juniors, EmployeeType.TeamLead);
 
         var wishlistParticipants = _hackathon.Start(juniors, teamLeads);
         var teams = _hrManager.OrganizeHackathon(juniors, teamLeads, wishlistParticipants);

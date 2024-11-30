@@ -20,7 +20,7 @@ public class EmployeeServiceTests
     [Fact]
     public void SaveEmployeesByTypeAsync_ShouldAddNewEmployees_WhenTheyDoNotExist()
     {
-        var employeeType = EmployeeType.JUNIOR;
+        var employeeType = EmployeeType.Junior;
         var employees = ModelFactory.GenerateEmployees(2, "Junior");
 
         _employeeService.SaveEmployeesByTypeAsync(employees, employeeType);

@@ -1,13 +1,136 @@
-version: '3'
+networks:
+  hackathon_network:
+    driver: bridge
+
 services:
-  dio_postgressql:
+  hackathon_postgres_sql:
     image: postgres:13
     volumes:
       - ../initdb:/docker-entrypoint-initdb.d
     environment:
-      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME:-postgres}
-      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-postgres}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=hackathon
     ports:
       - "5433:5432"
     restart: always
+    networks:
+      - hackathon_network
+  
+  hrDirector:
+    depends_on:
+      hackathon_postgres_sql:
+        condition: service_started
+    image: hrdirector
+    build:
+      context: .
+      dockerfile: HrDirector/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./HackathonEveryone/Resources/appsettings.json:/app/appsettings.json
+    networks:
+      - hackathon_network
+    restart: always
+  
+  hrManager:
+    image: hrmanager
+    build:
+      context: .
+      dockerfile: HrManager/Dockerfile
+    depends_on:
+      hrDirector:
+        condition: service_started
+    ports:
+      - "8081:8081"
+    networks:
+      - hackathon_network
+    restart: always
+    volumes:
+      - ./HackathonEveryone/Resources/appsettings.json:/app/appsettings.json
+      - ./HackathonEveryone/Resources/Juniors5.csv:/app/Juniors5.csv
+      - ./HackathonEveryone/Resources/TeamLeads5.csv:/app/TeamLeads5.csv
+  x-employee-template: &employee-template
+    depends_on:
+      hrManager:
+        condition: service_started
+    image: employee
+    build:
+      context: .
+      dockerfile: HackathonEmployee/Dockerfile
+    volumes:
+      - ./HackathonEveryone/Resources/appsettings.json:/app/appsettings.json
+      - ./HackathonEveryone/Resources/Juniors5.csv:/app/Juniors5.csv
+      - ./HackathonEveryone/Resources/TeamLeads5.csv:/app/TeamLeads5.csv
+    networks:
+      - hackathon_network
+  junior-1:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=Junior
+      - EMPLOYER_ID=1
+    ports:
+      - "8082:8082"
+  junior-2:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=Junior
+      - EMPLOYER_ID=2
+    ports:
+      - "8083:8083"
+  junior-3:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=Junior
+      - EMPLOYER_ID=3
+    ports:
+      - "8084:8084"
+  junior-4:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=Junior
+      - EMPLOYER_ID=4
+    ports:
+      - "8085:8085"
+  junior-5:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=Junior
+      - EMPLOYER_ID=5
+    ports:
+      - "8086:8086"
+  team-lead-1:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=TeamLead
+      - EMPLOYER_ID=1
+    ports:
+      - "8087:8087"
+  team-lead-2:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=TeamLead
+      - EMPLOYER_ID=2
+    ports:
+      - "8088:8088"
+  team-lead-3:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=TeamLead
+      - EMPLOYER_ID=3
+    ports:
+      - "8089:8089"
+  team-lead-4:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=TeamLead
+      - EMPLOYER_ID=4
+    ports:
+      - "8090:8090"
+  team-lead-5:
+    <<: *employee-template
+    environment:
+      - EMPLOYER_TYPE=TeamLead
+      - EMPLOYER_ID=5
+    ports:
+      - "8091:8091"

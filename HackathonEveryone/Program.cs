@@ -38,7 +38,7 @@ public static class Program
                     .AddDbContext<ApplicationDbContext>(options =>
                         options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")))
                     .BuildServiceProvider();
-
+                
                 var context = serviceProvider.GetService<ApplicationDbContext>();
 
                 services.AddTransient<Hackathon>();

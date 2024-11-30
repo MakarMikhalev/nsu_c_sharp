@@ -3,7 +3,7 @@ using HackathonContract.Model;
 
 namespace HackathonHrDirector;
 
-public sealed class HrDirector
+public class HrDirector
 {
     public double CalculateMeanHarmonic(HackathonMetaInfo hackathonMetaInfo)
     {

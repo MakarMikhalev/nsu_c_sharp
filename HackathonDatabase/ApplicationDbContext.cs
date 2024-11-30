@@ -1,5 +1,7 @@
 using HackathonDatabase.model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace HackathonDatabase;
 
@@ -18,7 +20,6 @@ public sealed class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
         modelBuilder.Entity<EmployeeEntity>()
             .HasKey(e => new { e.Id, e.EmployeeType });
         
