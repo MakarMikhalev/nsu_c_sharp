@@ -12,54 +12,74 @@ namespace HackathonTest;
 [TestClass]
 public class HrManagerTest
 {
-    [Test]
-    public void OrganizeHackathonTest()
+    private readonly Mock<ITeamBuildingStrategy> _teamBuildingStrategyMock = new();
+    private readonly List<Team> _predictionTeams = ModelFactory.GenerateTeams(3).ToList();
+    private HrManager _hrManager;
+
+    private readonly IEnumerable<Employee>
+        jEmployees = ModelFactory.GenerateEmployees(3, "Junior");
+
+    private readonly IEnumerable<Employee> sEmployees =
+        ModelFactory.GenerateEmployees(3, "TeamLead");
+
+    private WishlistParticipants _wishlistParticipants;
+
+    [SetUp]
+    public void SetUp()
     {
-        var teamBuildingStrategyMock = new Mock<ITeamBuildingStrategy>();
-
-        var predefinedTeams = new List<Team>
-        {
-            new(new Employee(3, "Junior-3"), new Employee(3, "Senior-3")),
-            new(new Employee(2, "Junior-2"), new Employee(2, "Senior-2")),
-            new(new Employee(1, "Junior-1"), new Employee(1, "Senior-1"))
-        };
-
-        teamBuildingStrategyMock.Setup(strategy =>
+        _teamBuildingStrategyMock.Setup(strategy =>
                 strategy.BuildTeams(It.IsAny<IEnumerable<Employee>>(),
                     It.IsAny<IEnumerable<Employee>>(),
                     It.IsAny<IEnumerable<Wishlist>>(), It.IsAny<IEnumerable<Wishlist>>()))
-            .Returns(predefinedTeams);
+            .Returns(_predictionTeams);
 
-        var hrManager = new HrManager(teamBuildingStrategyMock.Object);
-        var jEnumerable = GeneratorEmployer.GenerateJuniors();
-        var sEnumerator = GeneratorEmployer.GenerateSeniors();
-        var wishlistParticipants = new WishlistParticipants(GenerateWishlists(jEnumerable),
-            GenerateWishlists(sEnumerator));
+        _hrManager = new HrManager(_teamBuildingStrategyMock.Object);
 
-        var hackathonMetaInfo =
-            hrManager.OrganizeHackathon(jEnumerable, sEnumerator, wishlistParticipants);
+        _wishlistParticipants = new WishlistParticipants(GenerateWishlists(jEmployees),
+            GenerateWishlists(sEmployees));
+    }
 
+    [Test]
+    public void Success_WhenHackathonIsOrganized_ThenTeamsAreBuiltSuccessfully()
+    {
+        var hackathonMetaInfo = _hrManager.OrganizeHackathon(
+            jEmployees,
+            sEmployees,
+            _wishlistParticipants
+        );
+
+        AssertHackathonResults(hackathonMetaInfo);
+        VerifyStrategyWasCalledOnce();
+    }
+
+    private void AssertHackathonResults(HackathonMetaInfo hackathonMetaInfo)
+    {
         Assert.AreEqual(3, hackathonMetaInfo.Teams.Count(),
             "Количество команд не совпадает с ожидаемым.");
-
         CollectionAssert.AreEqual(
-            predefinedTeams,
+            _predictionTeams.ToList(),
             hackathonMetaInfo.Teams.ToList(),
-            "Распределение команд не соответствует ожидаемому.");
+            "Распределение команд не соответствует ожидаемому."
+        );
+    }
 
-        teamBuildingStrategyMock.Verify(strategy =>
-                strategy.BuildTeams(
-                    It.IsAny<IEnumerable<Employee>>(),
-                    It.IsAny<IEnumerable<Employee>>(),
-                    It.IsAny<IEnumerable<Wishlist>>(),
-                    It.IsAny<IEnumerable<Wishlist>>()
-                ),
+    private void VerifyStrategyWasCalledOnce()
+    {
+        _teamBuildingStrategyMock.Verify(
+            strategy => strategy.BuildTeams(
+                It.IsAny<IEnumerable<Employee>>(),
+                It.IsAny<IEnumerable<Employee>>(),
+                It.IsAny<IEnumerable<Wishlist>>(),
+                It.IsAny<IEnumerable<Wishlist>>()
+            ),
             Times.Once,
-            "Стратегия должна быть вызвана ровно один раз.");
+            "Стратегия должна быть вызвана ровно один раз."
+        );
     }
 
     private IEnumerable<Wishlist> GenerateWishlists(IEnumerable<Employee> employees)
     {
-        return employees.Select(jr => new Wishlist(jr.Id, [1, 2, 3]));
+        var desiredEmployees = ModelFactory.GenerateDesiredEmployees(3);
+        return employees.Select(jr => new Wishlist(jr.Id, desiredEmployees));
     }
 }

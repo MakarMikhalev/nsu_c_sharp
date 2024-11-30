@@ -1,4 +1,5 @@
 using HackathonContract.Model;
+using HackathonDatabase.model;
 
 namespace HackathonRunner;
 

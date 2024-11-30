@@ -1,0 +1,13 @@
+version: '3'
+services:
+  dio_postgressql:
+    image: postgres:13
+    volumes:
+      - ../initdb:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-postgres}
+      - POSTGRES_DB=hackathon
+    ports:
+      - "5433:5432"
+    restart: always

@@ -5,7 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using HackathonRunner;
 using HackathonContract.ServiceContract;
+using HackathonDatabase;
+using HackathonDatabase.service;
 using HackathonStrategy;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HackathonEveryone;
 
@@ -13,7 +17,7 @@ public static class Program
 {
     public static void Main()
     {
-        CreateHostBuilder().Build().RunAsync();
+        CreateHostBuilder().Build().Run();
     }
 
     private static IHostBuilder CreateHostBuilder() =>
@@ -25,11 +29,26 @@ public static class Program
             })
             .ConfigureServices(services =>
             {
-                services.AddTransient<Hackathon>(_ => new Hackathon());
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+
+                var serviceProvider = new ServiceCollection()
+                    .AddDbContext<ApplicationDbContext>(options =>
+                        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")))
+                    .BuildServiceProvider();
+
+                var context = serviceProvider.GetService<ApplicationDbContext>();
+
+                services.AddTransient<Hackathon>();
                 services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
                 services.AddTransient<HrManager>();
                 services.AddTransient<HrDirector>();
+                services.AddTransient<IHackathonService, HackathonService>();
+                services.AddTransient<IEmployeeService, EmployeeService>();
                 services.AddTransient<HackathonRunner>();
                 services.AddHostedService<HackathonWorker>();
+                services.AddSingleton(context);
             });
 }
