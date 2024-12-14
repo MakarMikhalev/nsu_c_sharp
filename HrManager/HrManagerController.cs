@@ -11,15 +11,15 @@ public class HrManagerController(HrManagerService hrManagerService) : Controller
     private readonly object _lockObj = new();
 
     [HttpPost]
-    public IActionResult CreateWishList(
+    public IActionResult ProcessWishlist(
         [FromQuery] string type,
         [FromBody] Wishlist wishlist)
     {
         Console.WriteLine("Catch new request, wishlist: " + wishlist);
-        
+
         lock (_lockObj)
         {
-            hrManagerService.tryStartHackathon(type, wishlist);
+            hrManagerService.TryStartHackathon(type, wishlist);
         }
 
         return Ok("Wishlist succesfull processing");

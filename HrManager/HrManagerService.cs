@@ -30,7 +30,7 @@ public class HrManagerService
         countParticipants = jEmployees.Count + tEmployees.Count;
     }
 
-    public async Task tryStartHackathon(string type, Wishlist wishlist)
+    public void TryStartHackathon(string type, Wishlist wishlist)
     {
         Console.WriteLine("Try start hackathon, type: " + type);
         switch (EnumExtensions.GetEmployeeTypeByDisplayName(type))
@@ -67,7 +67,7 @@ public class HrManagerService
                 Encoding.UTF8,
                 "application/json"
             );
-            var response = await Client.PostAsync($"http://hrDirector:8080/api/send_hackathon", content);
+            var response = Client.PostAsync("http://hrDirector:8080/api/send_hackathon", content).GetAwaiter().GetResult();
 
             if (response.IsSuccessStatusCode)
             {

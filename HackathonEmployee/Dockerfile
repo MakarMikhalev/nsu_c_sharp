@@ -4,7 +4,6 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Копируем файлы и восстанавливаем зависимости
 COPY ["HackathonEmployee/HackathonEmployee.csproj", "HackathonEmployee/"]
 COPY ["HackathonContract/HackathonContract.csproj", "HackathonContract/"]
 RUN dotnet restore "HackathonEmployee/HackathonEmployee.csproj"
