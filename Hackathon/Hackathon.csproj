@@ -11,10 +11,4 @@
   <ProjectReference Include="..\HackathonContract\HackathonContract.csproj" />
   <ProjectReference Include="..\HackathonServiceDatabase\HackathonServiceDatabase.csproj" />
 </ItemGroup>
-
-<ItemGroup>
-  <Content Include="..\.dockerignore">
-    <Link>.dockerignore</Link>
-  </Content>
-</ItemGroup>
 </Project>

@@ -15,10 +15,7 @@ public class Program
     public static async Task Main()
     {
         Console.WriteLine("Start task create employee");
-
-        Console.WriteLine(Environment.GetEnvironmentVariable("EMPLOYER_TYPE"));
-        Console.WriteLine(Environment.GetEnvironmentVariable("EMPLOYER_ID"));
-
+        
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -26,9 +23,7 @@ public class Program
 
         var type = Environment.GetEnvironmentVariable("EMPLOYER_TYPE");
         var id = int.Parse(Environment.GetEnvironmentVariable("EMPLOYER_ID"));
-
-        Console.WriteLine("Employee id: " + id + "  type: " + type);
-
+        
         var juniorFile = configuration["HackathonSettings:JuniorFile"];
         var teamLeadFile = configuration["HackathonSettings:TeamLeadFile"];
 
