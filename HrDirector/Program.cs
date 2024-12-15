@@ -1,4 +1,7 @@
 using System.Net;
+using HackathonEveryone.Utils;
+using HackathonRabbitMq;
+using RabbitMQ.Client;
 
 namespace HackathonHrDirector;
 
@@ -27,12 +30,6 @@ public class Program
                         config.AddJsonFile("appsettings.json", optional: true,
                             reloadOnChange: true);
                     })
-                    .ConfigureAppConfiguration(config =>
-                    {
-                        config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("appsettings.json", optional: true,
-                            reloadOnChange: true);
-                    })
                     .ConfigureServices(services =>
                     {
                         var configuration = new ConfigurationBuilder()
@@ -45,14 +42,23 @@ public class Program
                                 options.UseNpgsql(
                                     configuration.GetConnectionString("DefaultConnection")))
                             .BuildServiceProvider();
-
+                        
+                        var connectionFactory = new ConnectionFactory { HostName = "hackathon_rabbitmq", UserName = "rabbit", Password = "rabbit", Port = 5672 };
+                        
                         var context = serviceProvider.GetService<ApplicationDbContext>();
-
                         services.AddTransient<IEmployeeService, EmployeeService>();
                         services.AddTransient<IHackathonService, HackathonService>();
+                        
+                        var queueNames = ParseCsv.RunAsyncNamesQueue(configuration["HackathonSettings:JuniorFile"], configuration["HackathonSettings:TeamLeadFile"]);
+                        Console.WriteLine($"Queue Names: {string.Join(", ", queueNames)}");
+                        
+                        var rabbitMqService = new RabbitMqService(connectionFactory, queueNames, configuration["RabbitMq:QueueMetaInfo"]);
+                        services.AddSingleton<IRabbitMqService>(rabbitMqService);
                         services.AddTransient<HrDirector>();
                         services.AddTransient<HrDirectorService>();
                         services.AddTransient<HrDirectorController>();
+                        services.AddTransient<HackathonService>();
+                        services.AddHostedService<HackathonSender>();
                         services.AddSingleton(context);
                         services.AddControllers();
                     })

@@ -21,7 +21,9 @@
   <ItemGroup>
     <ProjectReference Include="..\HackathonContract\HackathonContract.csproj" />
     <ProjectReference Include="..\HackathonDatabase\HackathonDatabase.csproj" />
+    <ProjectReference Include="..\HackathonRabbitMq\HackathonRabbitMq.csproj" />
     <ProjectReference Include="..\HackathonServiceDatabase\HackathonServiceDatabase.csproj" />
+    <ProjectReference Include="..\HackathonStrategy\HackathonStrategy.csproj" />
   </ItemGroup>
   
   <ItemGroup>

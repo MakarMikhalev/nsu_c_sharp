@@ -1,9 +1,10 @@
-using System.Net;
 using HackathonContract.ServiceContract;
 using HackathonDatabase;
 using HackathonDatabase.service;
 using HackathonStrategy;
+using HackthonEmployee;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 
 namespace HackathonHrManager;
 
@@ -16,45 +17,30 @@ public class Program
 
     private static IHostBuilder CreateHostBuilder() =>
         Host.CreateDefaultBuilder()
-            .ConfigureWebHost(webBuilder =>
+            .ConfigureServices(services =>
             {
-                webBuilder.UseKestrel(options => { options.Listen(IPAddress.Any, 8081); })
-                    .ConfigureAppConfiguration(config =>
-                    {
-                        config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("appsettings.json", optional: true,
-                            reloadOnChange: true);
-                    })
-                    .ConfigureServices(services =>
-                    {
-                        var configuration = new ConfigurationBuilder()
-                            .SetBasePath(Directory.GetCurrentDirectory())
-                            .AddJsonFile("appsettings.json")
-                            .Build();
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .Build();
 
-                        var serviceProvider = new ServiceCollection()
-                            .AddDbContext<ApplicationDbContext>(options =>
-                                options.UseNpgsql(
-                                    configuration.GetConnectionString("DefaultConnection")))
-                            .BuildServiceProvider();
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-                        var context = serviceProvider.GetService<ApplicationDbContext>();
+                var connectionFactory = new ConnectionFactory
+                {
+                    HostName = "hackathon_rabbitmq",
+                    UserName = "rabbit",
+                    Password = "rabbit",
+                    Port = 5672
+                };
 
-                        services.AddTransient<HrManager>();
-                        services.AddTransient<HrManagerController>();
-                        services.AddTransient<IEmployeeService, EmployeeService>();
-                        services.AddSingleton<HrManagerService>();
-                        services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
-                        services.AddSingleton(context);
-                        services.AddControllers();
-                    })
-                    .Configure(app =>
-                    {
-                        app.UseRouting();
-                        app.UseEndpoints(endpoints =>
-                        {
-                            endpoints.MapControllers();
-                        });
-                    });
-            });
+                ITeamBuildingStrategy teamBuildingStrategy = new TeamBuildingStrategy();
+                var hrManager = new HrManager(teamBuildingStrategy);
+                var hrManagerService = new HrManagerService(configuration, hrManager);
+                var queueEmployee = configuration["RabbitMq:QueueEmployer"] ?? "QueueEmployee";
+                services.AddHostedService<RabbitMqListener>(_ => new RabbitMqListener(queueEmployee, "hrManager", connectionFactory, hrManagerService));
+                services.AddTransient<IEmployeeService, EmployeeService>();
+                services.AddSingleton(hrManagerService);
+            });    
 }
