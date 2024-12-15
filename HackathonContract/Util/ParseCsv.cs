@@ -7,7 +7,7 @@ namespace HackathonEveryone.Utils;
 
 public static class ParseCsv
 {
-    public static List<Employee> RunAsync(string? filePath)
+    public static List<Employee> RunAsync(string filePath)
     {
         var employees = new List<Employee>();
 
@@ -20,5 +20,22 @@ public static class ParseCsv
         employees.AddRange(records);
         
         return employees;
+    }
+
+    public static List<string> RunAsyncNamesQueue(params string[] filePaths)
+    {
+        var allNames = new List<string>();
+
+        foreach (var filePath in filePaths)
+        {
+            var employees = RunAsync(filePath);
+            var names = employees
+                .Select(emp => $"{emp.GetType()}_{emp.Id}")
+                .ToList();
+
+            allNames.AddRange(names);
+        }
+
+        return allNames;
     }
 }

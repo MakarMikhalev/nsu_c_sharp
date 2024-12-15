@@ -4,7 +4,7 @@ networks:
 
 services:
   hackathon_postgres_sql:
-    image: postgres:13
+    image: postgres:15
     volumes:
       - ../initdb:/docker-entrypoint-initdb.d
     environment:
@@ -16,11 +16,31 @@ services:
     restart: always
     networks:
       - hackathon_network
-  
-  hrDirector:
+      
+  hackathon_rabbitmq:
+    image: rabbitmq:3.10.7-management
+    container_name: hackathon_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit
+      RABBITMQ_DEFAULT_PASS: rabbit
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hackathon_network
     depends_on:
       hackathon_postgres_sql:
         condition: service_started
+      
+  hrDirector:
+    depends_on:
+      hackathon_rabbitmq:
+        condition: service_healthy
     image: hrdirector
     build:
       context: .
@@ -29,6 +49,8 @@ services:
       - "8080:8080"
     volumes:
       - ./HackathonEveryone/Resources/appsettings.json:/app/appsettings.json
+      - ./HackathonEveryone/Resources/Juniors5.csv:/app/Juniors5.csv
+      - ./HackathonEveryone/Resources/TeamLeads5.csv:/app/TeamLeads5.csv
     networks:
       - hackathon_network
     restart: always
@@ -50,6 +72,9 @@ services:
       - ./HackathonEveryone/Resources/appsettings.json:/app/appsettings.json
       - ./HackathonEveryone/Resources/Juniors5.csv:/app/Juniors5.csv
       - ./HackathonEveryone/Resources/TeamLeads5.csv:/app/TeamLeads5.csv
+    environment:
+      - HR_MANAGER_QUEUE=hr-manager
+      
   x-employee-template: &employee-template
     depends_on:
       hrManager:
@@ -58,12 +83,16 @@ services:
     build:
       context: .
       dockerfile: HackathonEmployee/Dockerfile
+    restart: always
     volumes:
       - ./HackathonEveryone/Resources/appsettings.json:/app/appsettings.json
       - ./HackathonEveryone/Resources/Juniors5.csv:/app/Juniors5.csv
       - ./HackathonEveryone/Resources/TeamLeads5.csv:/app/TeamLeads5.csv
     networks:
       - hackathon_network
+    environment:
+      - HR_MANAGER_QUEUE=hr-manager
+      
   junior-1:
     <<: *employee-template
     environment:
@@ -71,6 +100,7 @@ services:
       - EMPLOYER_ID=1
     ports:
       - "8082:8082"
+      
   junior-2:
     <<: *employee-template
     environment:
@@ -78,6 +108,7 @@ services:
       - EMPLOYER_ID=2
     ports:
       - "8083:8083"
+      
   junior-3:
     <<: *employee-template
     environment:
@@ -85,6 +116,7 @@ services:
       - EMPLOYER_ID=3
     ports:
       - "8084:8084"
+      
   junior-4:
     <<: *employee-template
     environment:
@@ -92,6 +124,7 @@ services:
       - EMPLOYER_ID=4
     ports:
       - "8085:8085"
+      
   junior-5:
     <<: *employee-template
     environment:
@@ -99,6 +132,7 @@ services:
       - EMPLOYER_ID=5
     ports:
       - "8086:8086"
+      
   team-lead-1:
     <<: *employee-template
     environment:
@@ -106,6 +140,7 @@ services:
       - EMPLOYER_ID=1
     ports:
       - "8087:8087"
+      
   team-lead-2:
     <<: *employee-template
     environment:
@@ -113,6 +148,7 @@ services:
       - EMPLOYER_ID=2	
     ports:
       - "8088:8088"
+      
   team-lead-3:
     <<: *employee-template
     environment:
@@ -120,6 +156,7 @@ services:
       - EMPLOYER_ID=3
     ports:
       - "8089:8089"
+      
   team-lead-4:
     <<: *employee-template
     environment:
@@ -127,6 +164,7 @@ services:
       - EMPLOYER_ID=4
     ports:
       - "8090:8090"
+      
   team-lead-5:
     <<: *employee-template
     environment:
