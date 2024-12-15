@@ -1,67 +1,47 @@
-﻿using System.Text;
-using HackathonContract.Model;
-using HackathonContract.Model.Enum;
-using HackathonDatabase.model;
-using HackathonEveryone.Utils;
+﻿using HackathonRabbitMq;
 using Microsoft.Extensions.Configuration;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using RabbitMQ.Client;
 
 namespace HackthonEmployee;
 
 public class Program
 {
-    private static readonly HttpClient Client = new();
-
-    public static async Task Main()
+    public static void Main()
     {
-        Console.WriteLine("Start task create employee");
-        
-        var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .Build();
-
-        var type = Environment.GetEnvironmentVariable("EMPLOYER_TYPE");
-        var id = int.Parse(Environment.GetEnvironmentVariable("EMPLOYER_ID"));
-        
-        var juniorFile = configuration["HackathonSettings:JuniorFile"];
-        var teamLeadFile = configuration["HackathonSettings:TeamLeadFile"];
-
-        var content = new StringContent(JsonSerializer.Serialize(
-                CreateWishlist(id, type, juniorFile, teamLeadFile)),
-            Encoding.UTF8,
-            "application/json"
-        );
-
-        await SendRequest(type, content);
+        CreateHostBuilder().Build().Run();
     }
 
-    private static async Task SendRequest(string type, StringContent content)
-    {
-        var url = $"http://hrManager:8081/api/send_wishlist?type=" + type;
-        Console.WriteLine("Url " + url);
-        var response = await Client.PostAsync(url, content);
-        response.EnsureSuccessStatusCode();
+    private static IHostBuilder CreateHostBuilder()
+        =>
+        Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration(config =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: true,
+                    reloadOnChange: true);
+            })
+            .ConfigureServices(services =>
+            {
+                var connectionFactory = new ConnectionFactory { HostName = "hackathon_rabbitmq", UserName = "rabbit", Password = "rabbit", Port = 5672 };
+                
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json")
+                    .Build();
 
-        var responseBody = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(responseBody);
-    }
-
-    private static Wishlist? CreateWishlist(
-        int id,
-        string type,
-        string juniorFile,
-        string teamLeadFile)
-    {
-        Console.WriteLine("Create wish list");
-        var employeeType = EnumExtensions.GetEmployeeTypeByDisplayName(type);
-        return employeeType switch
-        {
-            EmployeeType.Junior => ParseCsv.RunAsync(juniorFile).Find(e => e.Id == id)
-                .CreateWishlist(ParseCsv.RunAsync(juniorFile)),
-            EmployeeType.TeamLead => ParseCsv.RunAsync(teamLeadFile).Find(e => e.Id == id)
-                .CreateWishlist(ParseCsv.RunAsync(teamLeadFile)),
-            _ => null
-        };
-    }
+                var queueEmployee = configuration["RabbitMq:QueueEmployer"] ?? "QueueEmployer";
+                var queueName = Environment.GetEnvironmentVariable("HR_MANAGER_QUEUE") ?? "hr-manager";
+                
+                var rabbitMqService = new RabbitMqService(connectionFactory, [queueName], queueEmployee);
+                var employerService = new EmployerService(rabbitMqService);
+                var queueMetaInfo = configuration["RabbitMq:QueueMetaInfo"] ?? "QueueMetaInfo";
+                
+                var type = Environment.GetEnvironmentVariable("EMPLOYER_TYPE")?.ToUpper();
+                var employeeId = Environment.GetEnvironmentVariable("EMPLOYER_ID");
+                var topicExchange = $"{type}-{employeeId}";
+                Console.WriteLine($"Employee topic exchange: {topicExchange}");
+                services.AddHostedService<RabbitMqListener>(_ => new RabbitMqListener(queueMetaInfo, topicExchange, connectionFactory, employerService));
+            });
 }
