@@ -1,4 +1,9 @@
 using System.Net;
+using HackathonDatabase.model;
+using HackathonEveryone.Utils;
+using HackathonRabbitMq;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using RabbitMQ.Client;
 
 namespace HackathonHrDirector;
 
@@ -27,12 +32,6 @@ public class Program
                         config.AddJsonFile("appsettings.json", optional: true,
                             reloadOnChange: true);
                     })
-                    .ConfigureAppConfiguration(config =>
-                    {
-                        config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("appsettings.json", optional: true,
-                            reloadOnChange: true);
-                    })
                     .ConfigureServices(services =>
                     {
                         var configuration = new ConfigurationBuilder()
@@ -45,14 +44,20 @@ public class Program
                                 options.UseNpgsql(
                                     configuration.GetConnectionString("DefaultConnection")))
                             .BuildServiceProvider();
-
+                        
+                        var connectionFactory = new ConnectionFactory { HostName = "hackathon_rabbitmq", UserName = "rabbit", Password = "rabbit", Port = 5672 };
+                        
                         var context = serviceProvider.GetService<ApplicationDbContext>();
-
                         services.AddTransient<IEmployeeService, EmployeeService>();
                         services.AddTransient<IHackathonService, HackathonService>();
+                        
+                        var rabbitMqService = new RabbitMqService(connectionFactory, createQueueNames(), configuration["RabbitMq:QueueMetaInfo"]);
+                        services.AddSingleton<IRabbitMqService>(rabbitMqService);
                         services.AddTransient<HrDirector>();
                         services.AddTransient<HrDirectorService>();
                         services.AddTransient<HrDirectorController>();
+                        services.AddTransient<HackathonService>();
+                        services.AddHostedService<HackathonSender>();
                         services.AddSingleton(context);
                         services.AddControllers();
                     })
@@ -62,4 +67,21 @@ public class Program
                         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
                     });
             });
+
+    private static List<string> createQueueNames(int size = 10)
+    {
+        var resultList = new List<string>();
+        var enumValues = Enum.GetValues(typeof(EmployeeType));
+
+        for (int i = 1; i <= size; ++i)
+        {
+            foreach (var value in enumValues)
+            {
+                Console.WriteLine($"{value.ToString()?.ToUpper()}-{i}");
+                resultList.Add($"{value.ToString()?.ToUpper()}-{i}");
+            }
+        }
+        return resultList;
+    }
+
 }

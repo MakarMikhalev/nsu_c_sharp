@@ -13,6 +13,7 @@
     <ProjectReference Include="..\HackathonContract\HackathonContract.csproj" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <ProjectReference Include="..\HackathonRabbitMq\HackathonRabbitMq.csproj" />
   </ItemGroup>
 
   <ItemGroup>
